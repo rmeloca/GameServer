@@ -1,0 +1,13 @@
+version: '2'
+
+services:
+  game-server:
+    build: .
+    volumes:
+      - ./resources:/GameServer/resources
+      - ./configurations:/GameServer/configurations
+    ports:
+      - 8080:8080
+    environment:
+      - DB_URL=/GameServer/configurations/database
+      - RESOURCES_PATH=/GameServer/resources

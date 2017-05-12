@@ -1,3 +1,14 @@
+# Netbeans
+/nbproject/
+/nbactions.xml
+
+# Maven deploy
+/target/
+
+# Server folder
+/resources
+
+# Class files
 *.class
 
 # Mobile Tools for Java (J2ME)
