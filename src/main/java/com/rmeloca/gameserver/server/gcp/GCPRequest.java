@@ -13,12 +13,24 @@ public class GCPRequest {
 
     private final String station;
     private final GCPOperation operation;
-    private final Object data;
+    private final String data;
 
-    public GCPRequest(String station, GCPOperation operation, Object data) {
+    public GCPRequest(String station, GCPOperation operation, String data) {
         this.station = station;
         this.operation = operation;
         this.data = data;
+    }
+
+    public String getStation() {
+        return station;
+    }
+
+    public GCPOperation getOperation() {
+        return operation;
+    }
+
+    public String getData() {
+        return data;
     }
 
 }

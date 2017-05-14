@@ -7,12 +7,6 @@ package com.rmeloca.gameserver.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.rmeloca.gameserver.controller.GameController;
-import com.rmeloca.gameserver.controller.exception.ItemAlreadyExistException;
-import com.rmeloca.gameserver.controller.exception.ItemNotFoundException;
-import com.rmeloca.gameserver.game.Game;
-import com.rmeloca.gameserver.game.Profile;
-import com.rmeloca.gameserver.server.gcp.GCPCode;
 import com.rmeloca.gameserver.server.gcp.GCPResponse;
 import com.rmeloca.gameserver.server.http.HTTPCode;
 import com.rmeloca.gameserver.server.http.HTTPHeader;
@@ -59,58 +53,49 @@ public class Worker implements Runnable {
             HTTPRequest httpRequest = new HTTPRequest(this.inputStream);
             Logger.getLogger(Worker.class.getName()).log(Level.INFO, "{0} {1}", new Object[]{httpRequest.getMethod().name(), httpRequest.getResource()});
             String path;
-            HTTPResponse HTTPResponse;
+            HTTPResponse httpResponse;
             switch (httpRequest.getMethod()) {
                 case GET:
                     path = httpRequest.getResource();
-                    if (path.contains(".html")) {
-                        HTTPResponse = getFile(httpRequest, path, detectMimeType(path));
-                    } else if (path.endsWith(".css")) {
-                        HTTPResponse = getCSS(httpRequest, path);
-                    } else if (path.endsWith(".json")) {
-                        HTTPResponse = getFile(httpRequest, path, "application/json");
-                    } else if (path.endsWith(".js")) {
-                        HTTPResponse = getJS(httpRequest, path);
-                    } else if (path.endsWith(".png")) {
-                        HTTPResponse = getPNG(httpRequest, path);
-                    } else if (path.endsWith(".ttf")) {
-                        HTTPResponse = getOctet(httpRequest, path);
-                    } else if (path.endsWith(".zip")) {
-                        HTTPResponse = getOctet(httpRequest, path);
-                    } else if (path.endsWith(".map")) {
-                        HTTPResponse = getOctet(httpRequest, path);
-                    } else if (path.endsWith(".txt")) {
-                        HTTPResponse = getTXT(httpRequest, path);
+                    if (path.startsWith("/game")) {
+                        GameHandler gameHandler = new GameHandler();
+                        GCPResponse gcpResponse = gameHandler.getGameResource(path);
+                        httpResponse = getJSON(httpRequest, gcpResponse);
+                    } else if (path.equals("/inVhand")) {
+                        path = "/inVhand/index.html";
+                        httpResponse = getHTML(httpRequest, path);
                     } else if (path.startsWith("/files/")) {
-                        path = path.replaceFirst("/files", "");
-                        HTTPResponse = getJSON(httpRequest, path);
-                    } else if (path.startsWith("/game")) {
-                        Object responseJSON = getGameResource(path);
-                        GCPResponse gcpResponse = new GCPResponse(GCPCode.OK, responseJSON);
-                        HTTPResponse = getJSON(httpRequest, gcpResponse);
+                        path = path.replaceFirst("/files/", "/");
+                        httpResponse = getJSON(httpRequest, path);
                     } else if (resourceExists(path)) {
-                        path = "index.html";
-                        HTTPResponse = getHTML(httpRequest, path);
+                        if (path.contains(".")) {
+                            httpResponse = getFile(httpRequest, path);
+                        } else {
+                            path = "index.html";
+                            httpResponse = getHTML(httpRequest, path);
+                        }
                     } else {
                         path = "-";
-                        HTTPResponse = getHTML(httpRequest, path);
+                        httpResponse = getHTML(httpRequest, path);
                     }
                     break;
+
                 case POST:
                     path = httpRequest.getResource();
                     if (path.startsWith("/game")) {
-                        postGameResource(httpRequest, path);
-                        HTTPResponse = getJSON(httpRequest, path);
+                        GameHandler gameHandler = new GameHandler();
+                        GCPResponse postGameResource = gameHandler.postGameResource(httpRequest, path);
+                        httpResponse = getJSON(httpRequest, postGameResource);
                     } else {
                         path = "-";
-                        HTTPResponse = getHTML(httpRequest, path);
+                        httpResponse = getHTML(httpRequest, path);
                     }
                     break;
                 default:
                     throw new AssertionError(httpRequest.getMethod().name());
             }
-            HTTPResponse.send(this.outputStream);
-            Logger.getLogger(Worker.class.getName()).log(Level.INFO, "{0} {1}", new Object[]{String.valueOf(HTTPResponse.getCode()), path});
+            httpResponse.send(this.outputStream);
+            Logger.getLogger(Worker.class.getName()).log(Level.INFO, "{0} {1}", new Object[]{String.valueOf(httpResponse.getCode()), path});
         } catch (IOException ex) {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -133,6 +118,10 @@ public class Worker implements Runnable {
         }
     }
 
+    private HTTPResponse getHTML(HTTPRequest httpRequest, String path) throws IOException {
+        return getFile(httpRequest, path, "text/html");
+    }
+
     private String getDateGTM() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("E, dd MMM yyyy hh:mm:ss", Locale.ENGLISH);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -145,6 +134,10 @@ public class Worker implements Runnable {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm", Locale.ENGLISH);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         return simpleDateFormat.format(date);
+    }
+
+    private HTTPResponse getFile(HTTPRequest request, String path) throws IOException {
+        return getFile(request, path, detectMimeType(path));
     }
 
     private HTTPResponse getFile(HTTPRequest request, String path, String type) throws IOException {
@@ -179,44 +172,24 @@ public class Worker implements Runnable {
         return response;
     }
 
-    private String detectMimeType(String url){
-        if (url.contains(".html")) {
+    private String detectMimeType(String url) {
+        if (url.endsWith(".html")) {
             return "text/html";
+        } else if (url.endsWith(".css")) {
+            return "text/css";
+        } else if (url.endsWith(".json")) {
+            return "application/json";
+        } else if (url.endsWith(".js")) {
+            return "text/javascript";
+        } else if (url.endsWith(".png")) {
+            return "image/png";
+        } else if (url.endsWith(".txt")) {
+            return "text/plain";
         }
         return "application/octet-stream";
     }
-    
-    @Deprecated
-    private HTTPResponse getOctet(HTTPRequest request, String path) throws IOException {
-        return getFile(request, path, "application/octet-stream");
-    }
 
-    @Deprecated
-    private HTTPResponse getHTML(HTTPRequest request, String path) throws IOException {
-        return getFile(request, path, "text/html");
-    }
-
-    @Deprecated
-    private HTTPResponse getCSS(HTTPRequest request, String path) throws IOException {
-        return getFile(request, path, "text/css");
-    }
-
-    @Deprecated
-    private HTTPResponse getJS(HTTPRequest request, String path) throws IOException {
-        return getFile(request, path, "text/javascript");
-    }
-
-    @Deprecated
-    private HTTPResponse getPNG(HTTPRequest request, String path) throws IOException {
-        return getFile(request, path, "image/png");
-    }
-
-    @Deprecated
-    private HTTPResponse getTXT(HTTPRequest request, String path) throws IOException {
-        return getFile(request, path, "text/plain");
-    }
-    
-    private HTTPResponse getJSON(HTTPRequest request, GCPResponse object) {
+    private HTTPResponse getJSON(HTTPRequest request, Object object) {
         HTTPCode code;
         String message;
         String protocol;
@@ -307,62 +280,6 @@ public class Worker implements Runnable {
             return true;
         }
         return false;
-    }
-
-    private Object getGameResource(String path) {
-        Game game = new Game(1);
-        GameController gameController = new GameController();
-        try {
-            game = gameController.get(game);
-        } catch (ItemNotFoundException ex) {
-            try {
-                gameController.add(game);
-            } catch (ItemAlreadyExistException ex1) {
-                Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (path.startsWith("/game/profiles")) {
-            String[] url = path.split("/");
-            if (url.length < 4) {
-                return game.getProfiles();
-            }
-            String profileName = url[3];
-            try {
-                return game.getProfile(new Profile(profileName));
-            } catch (ItemNotFoundException ex) {
-                Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
-                return null;
-            }
-        } else if (path.startsWith("/game")) {
-            return game;
-        }
-        return null;
-    }
-
-    private void postGameResource(HTTPRequest request, String path) {
-        Game game = new Game(1);
-        GameController gameController = new GameController();
-        try {
-            game = gameController.get(game);
-        } catch (ItemNotFoundException ex) {
-            try {
-                gameController.add(game);
-            } catch (ItemAlreadyExistException ex1) {
-                Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (path.startsWith("/game/profiles")) {
-            Gson gson = new Gson();
-            Profile profile = gson.fromJson(request.getContent(), Profile.class);
-            game.addProfile(profile);
-            try {
-                gameController.update(game);
-            } catch (ItemNotFoundException ex) {
-                Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
     }
 
     private boolean resourceExists(String path) {

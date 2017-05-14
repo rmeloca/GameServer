@@ -25,6 +25,7 @@ public class HTTPRequest {
     private final int timeOut;
     private final HTTPHeader header;
     private final String content;
+    private final HTTPParameters parameters;
 
     public HTTPRequest(InputStream inputStream) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -36,7 +37,16 @@ public class HTTPRequest {
         }
         String[] dataRequest = dataRequestLine.split(" ");
         this.method = HTTPMethod.valueOf(dataRequest[0]);
-        this.resource = dataRequest[1];
+
+        if (dataRequest[1].contains("?")) {
+            String[] urlSplit = dataRequest[1].split("?");
+            this.resource = urlSplit[0];
+            this.parameters = new HTTPParameters(urlSplit[1]);
+        } else {
+            this.resource = dataRequest[1];
+            this.parameters = new HTTPParameters();
+        }
+
         this.protocol = dataRequest[2];
 
         this.header = new HTTPHeader();

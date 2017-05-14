@@ -7,6 +7,7 @@ package com.rmeloca.gameserver.server.Protocol;
 
 import com.google.gson.Gson;
 import com.rmeloca.gameserver.game.Profile;
+import com.rmeloca.gameserver.game.Trophy;
 import com.rmeloca.gameserver.server.gcp.GCPOperation;
 import com.rmeloca.gameserver.server.gcp.GCPRequest;
 import org.junit.Test;
@@ -24,7 +25,12 @@ public class RequestTest {
     @Test
     public void testSomeMethod() {
         Profile profile = new Profile("leonardo");
-        GCPRequest request = new GCPRequest("test1", GCPOperation.ADD_TROPHY, profile);
+        Trophy trophy = new Trophy("first-dead");
+        trophy.setDescription("first-dead");
+        trophy.setExperience(2);
+        trophy.setTittle("first-dead");
+        String toString = trophy.toString();
+        GCPRequest request = new GCPRequest("leonardo", GCPOperation.ADD_TROPHY, toString);
         Gson gson = new Gson();
         String toJson = gson.toJson(request);
         System.out.println(toJson);

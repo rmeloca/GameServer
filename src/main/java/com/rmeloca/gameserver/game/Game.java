@@ -34,6 +34,17 @@ public class Game implements Serializable {
         }
     }
 
+    public void deleteProfile(Profile profile) {
+        if (getProfiles().contains(profile)) {
+            getProfiles().remove(profile);
+        }
+    }
+
+    public void updateProfile(Profile profile) {
+        deleteProfile(profile);
+        addProfile(profile);
+    }
+
     public int getId() {
         return id;
     }

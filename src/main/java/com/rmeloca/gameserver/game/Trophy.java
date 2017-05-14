@@ -32,4 +32,9 @@ public class Trophy {
         this.tittle = tittle;
     }
 
+    @Override
+    public String toString() {
+        String toString = "{\"name\":" + this.name + "}";
+        return toString;
+    }
 }

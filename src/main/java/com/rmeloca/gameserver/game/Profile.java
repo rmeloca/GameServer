@@ -6,6 +6,8 @@
 package com.rmeloca.gameserver.game;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
@@ -14,13 +16,25 @@ import java.io.Serializable;
 public class Profile implements Serializable {
 
     private final String name;
+    private final Collection<Trophy> trophies;
 
     public Profile(String name) {
         this.name = name;
+        this.trophies = new ArrayList<>();
     }
 
     public String getName() {
         return this.name;
+    }
+
+    private Collection<Trophy> getTrophies() {
+        return this.trophies;
+    }
+
+    public void addTrophy(Trophy trophy) {
+        if (!getTrophies().contains(trophy)) {
+            getTrophies().add(trophy);
+        }
     }
 
     @Override
