@@ -61,9 +61,9 @@ public class Worker implements Runnable {
                         GameHandler gameHandler = new GameHandler();
                         GCPResponse gcpResponse = gameHandler.getGameResource(path);
                         httpResponse = getJSON(httpRequest, gcpResponse);
-                    } else if (path.equals("/inVhand")) {
-                        path = "/inVhand/index.html";
-                        httpResponse = getHTML(httpRequest, path);
+//                    } else if (path.equals("/inVhand")) {
+//                        path = "/inVhand/index.html";
+//                        httpResponse = getHTML(httpRequest, path);
                     } else if (path.startsWith("/files/")) {
                         path = path.replaceFirst("/files/", "/");
                         httpResponse = getJSON(httpRequest, path);

@@ -33,7 +33,7 @@ public class SerializePersistence<T extends Serializable> implements Persistence
     /**
      * Local padrao para serializaçao da coleçao.
      */
-    private static final String DB_URL = System.getenv("DB_URL");
+    private static final String DB_URL = System.getenv("DB_URL") != null ? System.getenv("DB_URL") : "/data/workspace/GameServer/configurations/database";
 
     /**
      * Constroi a persistencia resgatando as infomaçoes ja existentes.

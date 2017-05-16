@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class Server {
 
-    public static final String RESOURCES_PATH = System.getenv("RESOURCES_PATH");
+    public static final String RESOURCES_PATH = System.getenv("RESOURCES_PATH") != null ? System.getenv("RESOURCES_PATH") : "/data/workspace/GameServer/resources";
 
     public static void main(String argv[]) {
         GameController gameController = new GameController();

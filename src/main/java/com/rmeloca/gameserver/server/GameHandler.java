@@ -18,7 +18,6 @@ import com.rmeloca.gameserver.server.gcp.GCPRequest;
 import com.rmeloca.gameserver.server.gcp.GCPResponse;
 import com.rmeloca.gameserver.server.http.HTTPRequest;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
