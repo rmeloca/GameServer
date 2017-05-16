@@ -73,7 +73,6 @@ public class GameHandler {
         Object data = "";
         GCPCode code = GCPCode.OK;
         Gson gson = new Gson();
-        System.out.println(request.getContent());
         GCPRequest gcpRequest = gson.fromJson(request.getContent(), GCPRequest.class);
         Profile profile = gson.fromJson(gcpRequest.getStation(), Profile.class);
         GCPOperation operation = gcpRequest.getOperation();

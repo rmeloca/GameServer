@@ -12,12 +12,12 @@ package com.rmeloca.gameserver.server.gcp;
 public class GCPRequest {
 
     private final String station;
-    private final GCPOperation operation;
+    private final String operation;
     private final String data;
 
     public GCPRequest(String station, GCPOperation operation, String data) {
         this.station = station;
-        this.operation = operation;
+        this.operation = operation.name();
         this.data = data;
     }
 
@@ -26,7 +26,7 @@ public class GCPRequest {
     }
 
     public GCPOperation getOperation() {
-        return operation;
+        return GCPOperation.valueOf(operation);
     }
 
     public String getData() {
