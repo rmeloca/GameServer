@@ -10,5 +10,5 @@ package com.rmeloca.gameserver.server.gcp;
  * @author romulo
  */
 public enum GCPOperation {
-    ADD_TROPHY;
+    ADD_TROPHY, LIST_TROPHY, CLEAR_TROPHY;
 }

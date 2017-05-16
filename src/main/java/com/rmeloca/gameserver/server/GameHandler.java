@@ -17,6 +17,8 @@ import com.rmeloca.gameserver.server.gcp.GCPOperation;
 import com.rmeloca.gameserver.server.gcp.GCPRequest;
 import com.rmeloca.gameserver.server.gcp.GCPResponse;
 import com.rmeloca.gameserver.server.http.HTTPRequest;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,22 +74,40 @@ public class GameHandler {
     protected GCPResponse postGameResource(HTTPRequest request, String path) {
         Object data = "";
         GCPCode code = GCPCode.OK;
+        GameController gameController = new GameController();
         Gson gson = new Gson();
         GCPRequest gcpRequest = gson.fromJson(request.getContent(), GCPRequest.class);
-        Profile profile = gson.fromJson(gcpRequest.getStation(), Profile.class);
+        String station = gcpRequest.getStation();
+        Profile profile;
+        try {
+            profile = game.getProfile(new Profile(station));
+        } catch (ItemNotFoundException ex) {
+            data = "";
+            code = GCPCode.OK;
+            Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex);
+            GCPResponse gcpResponse = new GCPResponse(code, data);
+            return gcpResponse;
+        }
         GCPOperation operation = gcpRequest.getOperation();
         switch (operation) {
             case ADD_TROPHY:
                 String objectTrophy = gcpRequest.getData();
                 Trophy trophy = gson.fromJson(objectTrophy, Trophy.class);
                 profile.addTrophy(trophy);
+                code = GCPCode.OK;
+                break;
+            case LIST_TROPHY:
+                ArrayList<Trophy> trophies = profile.getTrophies();
+                code = GCPCode.OK;
+                data = gson.toJson(trophies);
+                break;
+            case CLEAR_TROPHY:
                 break;
             default:
                 throw new AssertionError(operation.name());
         }
         game.updateProfile(profile);
 
-        GameController gameController = new GameController();
         try {
             gameController.update(game);
             code = GCPCode.OK;

@@ -16,7 +16,7 @@ import java.util.Collection;
 public class Profile implements Serializable {
 
     private final String name;
-    private final Collection<Trophy> trophies;
+    private final ArrayList<Trophy> trophies;
 
     public Profile(String name) {
         this.name = name;
@@ -27,7 +27,7 @@ public class Profile implements Serializable {
         return this.name;
     }
 
-    private Collection<Trophy> getTrophies() {
+    public ArrayList<Trophy> getTrophies() {
         return this.trophies;
     }
 
