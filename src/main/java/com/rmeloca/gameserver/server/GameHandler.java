@@ -7,7 +7,6 @@ package com.rmeloca.gameserver.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.internal.LinkedTreeMap;
 import com.rmeloca.gameserver.controller.GameController;
 import com.rmeloca.gameserver.controller.exception.ItemAlreadyExistException;
 import com.rmeloca.gameserver.controller.exception.ItemNotFoundException;
