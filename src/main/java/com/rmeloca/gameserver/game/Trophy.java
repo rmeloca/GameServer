@@ -22,6 +22,22 @@ public class Trophy implements Serializable {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getExperience() {
+        return experience;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }

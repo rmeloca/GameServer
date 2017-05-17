@@ -30,6 +30,14 @@ public class Profile implements Serializable {
         return this.trophies;
     }
 
+    public ArrayList<String> getTrophiesName() {
+        ArrayList<String> trohpiesName = new ArrayList<>();
+        for (Trophy trophy : getTrophies()) {
+            trohpiesName.add(trophy.getName());
+        }
+        return trohpiesName;
+    }
+
     public void addTrophy(Trophy trophy) {
         if (!getTrophies().contains(trophy)) {
             getTrophies().add(trophy);

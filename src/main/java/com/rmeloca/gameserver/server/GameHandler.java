@@ -96,11 +96,11 @@ public class GameHandler {
                 JsonObject objectTrophy = gson.fromJson(request.getContent(), JsonObject.class).get("data").getAsJsonObject();
                 Trophy trophy = gson.fromJson(objectTrophy, Trophy.class);
                 profile.addTrophy(trophy);
-                gcpResponse = new GCPResponse(GCPCode.OK);
+                gcpResponse = new GCPResponse(GCPCode.OK, trophy.getName());
                 break;
             case LIST_TROPHY:
-                ArrayList<Trophy> trophies = profile.getTrophies();
-                gcpResponse = new GCPResponse(GCPCode.OK, gson.toJson(trophies));
+                ArrayList<String> trophiesName = profile.getTrophiesName();
+                gcpResponse = new GCPResponse(GCPCode.OK, gson.toJson(trophiesName));
                 break;
             case CLEAR_TROPHY:
                 gcpResponse = new GCPResponse(GCPCode.OK);
