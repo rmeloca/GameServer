@@ -72,9 +72,6 @@ public class GameHandler {
     }
 
     protected GCPResponse postGameResource(HTTPRequest request, String path) {
-        Object data = "";
-        GCPCode code = GCPCode.OK;
-        GameController gameController = new GameController();
         Gson gson = new Gson();
         GCPRequest gcpRequest = gson.fromJson(request.getContent(), GCPRequest.class);
         String station = gcpRequest.getStation();
@@ -85,6 +82,7 @@ public class GameHandler {
             profile = new Profile(station);
             game.addProfile(profile);
             try {
+                GameController gameController = new GameController();
                 gameController.update(game);
             } catch (ItemNotFoundException ex1) {
                 Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex1);
@@ -92,24 +90,23 @@ public class GameHandler {
             Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
         GCPOperation operation = gcpRequest.getOperation();
+        GCPResponse gcpResponse;
         switch (operation) {
             case ADD_TROPHY:
                 JsonObject objectTrophy = gson.fromJson(request.getContent(), JsonObject.class).get("data").getAsJsonObject();
                 Trophy trophy = gson.fromJson(objectTrophy, Trophy.class);
                 profile.addTrophy(trophy);
-                code = GCPCode.OK;
-                data = "";
+                gcpResponse = new GCPResponse(GCPCode.OK);
                 break;
             case LIST_TROPHY:
                 ArrayList<Trophy> trophies = profile.getTrophies();
-                code = GCPCode.OK;
-                data = gson.toJson(trophies);
+                gcpResponse = new GCPResponse(GCPCode.OK, gson.toJson(trophies));
                 break;
             case CLEAR_TROPHY:
+                gcpResponse = new GCPResponse(GCPCode.OK);
                 break;
             case ADD_PLAYER:
-                code = GCPCode.OK;
-                data = "";
+                gcpResponse = new GCPResponse(GCPCode.OK);
                 break;
             default:
                 throw new AssertionError(operation.name());
@@ -117,15 +114,11 @@ public class GameHandler {
         game.updateProfile(profile);
 
         try {
+            GameController gameController = new GameController();
             gameController.update(game);
-            code = GCPCode.OK;
-            data = "";
         } catch (ItemNotFoundException ex) {
             Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex);
-            code = GCPCode.OK;
-            data = "";
         } finally {
-            GCPResponse gcpResponse = new GCPResponse(code, data);
             return gcpResponse;
         }
     }

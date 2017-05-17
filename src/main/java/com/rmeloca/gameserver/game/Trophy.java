@@ -5,11 +5,13 @@
  */
 package com.rmeloca.gameserver.game;
 
+import java.io.Serializable;
+
 /**
  *
  * @author romulo
  */
-public class Trophy {
+public class Trophy implements Serializable {
 
     private final String name;
     private int experience;

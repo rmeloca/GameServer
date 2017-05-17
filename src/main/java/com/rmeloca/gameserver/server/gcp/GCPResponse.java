@@ -14,6 +14,11 @@ public class GCPResponse {
     private final GCPCode code;
     private final Object data;
 
+    public GCPResponse(GCPCode code) {
+        this.code = code;
+        this.data = "";
+    }
+
     public GCPResponse(GCPCode code, Object data) {
         this.code = code;
         this.data = data;

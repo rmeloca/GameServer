@@ -5,7 +5,6 @@
  */
 package com.rmeloca.gameserver.controller;
 
-import com.rmeloca.gameserver.controller.exception.ItemAlreadyExistException;
 import com.rmeloca.gameserver.controller.exception.ItemNotFoundException;
 import com.rmeloca.gameserver.game.Game;
 import com.rmeloca.gameserver.game.Profile;
@@ -13,7 +12,6 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
