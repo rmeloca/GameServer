@@ -6,6 +6,7 @@
 package com.rmeloca.gameserver.server;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import com.rmeloca.gameserver.controller.GameController;
 import com.rmeloca.gameserver.controller.exception.ItemAlreadyExistException;
 import com.rmeloca.gameserver.controller.exception.ItemNotFoundException;
@@ -81,19 +82,23 @@ public class GameHandler {
         try {
             profile = game.getProfile(new Profile(station));
         } catch (ItemNotFoundException ex) {
-            data = "";
-            code = GCPCode.OK;
+            profile = new Profile(station);
+            game.addProfile(profile);
+            try {
+                gameController.update(game);
+            } catch (ItemNotFoundException ex1) {
+                Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex1);
+            }
             Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex);
-            GCPResponse gcpResponse = new GCPResponse(code, data);
-            return gcpResponse;
         }
         GCPOperation operation = gcpRequest.getOperation();
         switch (operation) {
             case ADD_TROPHY:
-                String objectTrophy = gcpRequest.getData();
-                Trophy trophy = gson.fromJson(objectTrophy, Trophy.class);
+                LinkedTreeMap objectTrophy = (LinkedTreeMap) gcpRequest.getData();
+                Trophy trophy = new Trophy(path);
                 profile.addTrophy(trophy);
                 code = GCPCode.OK;
+                data = "";
                 break;
             case LIST_TROPHY:
                 ArrayList<Trophy> trophies = profile.getTrophies();
@@ -101,6 +106,10 @@ public class GameHandler {
                 data = gson.toJson(trophies);
                 break;
             case CLEAR_TROPHY:
+                break;
+            case ADD_PLAYER:
+                code = GCPCode.OK;
+                data = "";
                 break;
             default:
                 throw new AssertionError(operation.name());

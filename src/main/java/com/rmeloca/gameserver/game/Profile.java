@@ -7,7 +7,6 @@ package com.rmeloca.gameserver.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  *

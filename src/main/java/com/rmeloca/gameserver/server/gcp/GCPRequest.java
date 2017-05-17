@@ -13,9 +13,9 @@ public class GCPRequest {
 
     private final String station;
     private final String operation;
-    private final String data;
+    private Object data;
 
-    public GCPRequest(String station, GCPOperation operation, String data) {
+    public GCPRequest(String station, GCPOperation operation, Object data) {
         this.station = station;
         this.operation = operation.name();
         this.data = data;
@@ -29,8 +29,12 @@ public class GCPRequest {
         return GCPOperation.valueOf(operation);
     }
 
-    public String getData() {
+    public Object getData() {
         return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 
 }
