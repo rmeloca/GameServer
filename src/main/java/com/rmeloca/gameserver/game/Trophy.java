@@ -13,7 +13,7 @@ public class Trophy {
 
     private final String name;
     private int experience;
-    private String tittle;
+    private String title;
     private String description;
 
     public Trophy(String name) {
@@ -28,8 +28,8 @@ public class Trophy {
         this.experience = experience;
     }
 
-    public void setTittle(String tittle) {
-        this.tittle = tittle;
+    public void setTittle(String title) {
+        this.title = title;
     }
 
     @Override

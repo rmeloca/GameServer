@@ -6,6 +6,7 @@
 package com.rmeloca.gameserver.server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;
 import com.rmeloca.gameserver.controller.GameController;
 import com.rmeloca.gameserver.controller.exception.ItemAlreadyExistException;
@@ -94,8 +95,8 @@ public class GameHandler {
         GCPOperation operation = gcpRequest.getOperation();
         switch (operation) {
             case ADD_TROPHY:
-                LinkedTreeMap objectTrophy = (LinkedTreeMap) gcpRequest.getData();
-                Trophy trophy = new Trophy(path);
+                JsonObject objectTrophy = gson.fromJson(request.getContent(), JsonObject.class).get("data").getAsJsonObject();
+                Trophy trophy = gson.fromJson(objectTrophy, Trophy.class);
                 profile.addTrophy(trophy);
                 code = GCPCode.OK;
                 data = "";
