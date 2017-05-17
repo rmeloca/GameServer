@@ -41,7 +41,6 @@ public class SerializePersistence<T extends Serializable> implements Persistence
     public SerializePersistence() {
         Collection<T> items;
         try {
-            Map<String, String> env = System.getenv();
             items = deserialize();
         } catch (IOException | ClassNotFoundException ex) {
             items = new ArrayList<>();

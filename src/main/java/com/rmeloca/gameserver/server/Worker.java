@@ -76,7 +76,6 @@ public class Worker implements Runnable {
                         httpResponse = getHTML(httpRequest, path);
                     }
                     break;
-
                 case POST:
                     path = httpRequest.getResource();
                     if (path.startsWith("/game")) {
