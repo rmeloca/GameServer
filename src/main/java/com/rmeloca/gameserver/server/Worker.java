@@ -68,12 +68,12 @@ public class Worker implements Runnable {
                         if (path.contains(".")) {
                             httpResponse = getFile(httpRequest, path);
                         } else {
-                            path = "index.html";
-                            httpResponse = getHTML(httpRequest, path);
+                            path = "/html/index.html";
+                            httpResponse = getFile(httpRequest, getClass().getResourceAsStream(path), "text/html");
                         }
                     } else {
-                        path = "-";
-                        httpResponse = getHTML(httpRequest, path);
+                        path = "/html/404.html";
+                        httpResponse = getFile(httpRequest, getClass().getResourceAsStream(path), "text/html");
                     }
                     break;
                 case POST:
@@ -134,6 +134,42 @@ public class Worker implements Runnable {
 
     private HTTPResponse getFile(HTTPRequest request, String path) throws IOException {
         return getFile(request, path, detectMimeType(path));
+    }
+
+    private HTTPResponse getFile(HTTPRequest request, InputStream inputStream) throws IOException {
+        return getFile(request, inputStream, detectMimeType(inputStream.toString()));
+    }
+
+    private byte[] readAll(InputStream inputStream) {
+        try {
+            int available = inputStream.available();
+            byte[] read = new byte[available];
+            inputStream.read(read);
+            return read;
+        } catch (IOException ex) {
+            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+
+    private HTTPResponse getFile(HTTPRequest request, InputStream inputStream, String type) throws IOException {
+        String protocol = request.getProtocol();
+        byte[] content = readAll(inputStream);
+
+        HTTPCode code = HTTPCode.OK;
+        String message = "OK";
+
+        String dateGMT = getDateGTM();
+
+        HTTPHeader header = new HTTPHeader();
+        header.addAttribute("Location", "http://localhost:8080/");
+        header.addAttribute("Date", dateGMT);
+        header.addAttribute("Server", "RMelocaServer/1.0");
+        header.addAttribute("Content-Type", type);
+        header.addAttribute("Content-Length", String.valueOf(content.length));
+
+        HTTPResponse response = new HTTPResponse(protocol, code, message, content, header);
+        return response;
     }
 
     private HTTPResponse getFile(HTTPRequest request, String path, String type) throws IOException {
