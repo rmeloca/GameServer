@@ -23,8 +23,13 @@ import java.util.logging.Logger;
 public class Server {
 
     public static final String RESOURCES_PATH = System.getenv("RESOURCES_PATH") != null ? System.getenv("RESOURCES_PATH") : "./resources/";
+    public static int PORT;
 
     public static void main(String argv[]) {
+        if (argv.length < 1) {
+            Server.PORT = 8080;
+        }
+
         GameController gameController = new GameController();
         Game game = new Game(1);
         try {
@@ -35,7 +40,7 @@ public class Server {
         Logger.getLogger(Server.class.getName()).log(Level.INFO, "Server is Running");
         ServerSocket serverSocket = null;
         try {
-            serverSocket = new ServerSocket(8080);
+            serverSocket = new ServerSocket(Server.PORT);
             ExecutorService pool = Executors.newFixedThreadPool(20);
             while (true) {
                 Socket socket = serverSocket.accept();

@@ -12,8 +12,14 @@ import com.rmeloca.gameserver.server.http.HTTPCode;
 import com.rmeloca.gameserver.server.http.HTTPHeader;
 import com.rmeloca.gameserver.server.http.HTTPRequest;
 import com.rmeloca.gameserver.server.http.HTTPResponse;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -162,7 +168,7 @@ public class Worker implements Runnable {
         String dateGMT = getDateGTM();
 
         HTTPHeader header = new HTTPHeader();
-        header.addAttribute("Location", "http://localhost:8080/");
+        header.addAttribute("Location", "http://localhost:" + Server.PORT + "/");
         header.addAttribute("Date", dateGMT);
         header.addAttribute("Server", "RMelocaServer/1.0");
         header.addAttribute("Content-Type", type);
@@ -189,12 +195,26 @@ public class Worker implements Runnable {
             file = new File(Server.RESOURCES_PATH, "404.html");
         }
         protocol = request.getProtocol();
-        content = Files.readAllBytes(file.toPath());
+        byte[] fileContent = Files.readAllBytes(file.toPath());
 
         String dateGMT = getDateGTM();
 
+        StringBuilder footer = new StringBuilder();
+        footer.append("<footer>");
+        footer.append(dateGMT);
+        footer.append("</footer>");
+
+        byte[] footerBytes = footer.toString().getBytes();
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byteArrayOutputStream.write(fileContent);
+        if (type.equals("text/html")) {
+            byteArrayOutputStream.write(footerBytes);
+        }
+        content = byteArrayOutputStream.toByteArray();
+
         HTTPHeader header = new HTTPHeader();
-        header.addAttribute("Location", "http://localhost:8080/");
+        header.addAttribute("Location", "http://localhost:" + Server.PORT + "/");
         header.addAttribute("Date", dateGMT);
         header.addAttribute("Server", "RMelocaServer/1.0");
         header.addAttribute("Content-Type", type);
@@ -241,7 +261,7 @@ public class Worker implements Runnable {
         String dateGMT = getDateGTM();
 
         HTTPHeader header = new HTTPHeader();
-        header.addAttribute("Location", "http://localhost:8080/");
+        header.addAttribute("Location", "http://localhost:" + Server.PORT + "/");
         header.addAttribute("Date", dateGMT);
         header.addAttribute("Server", "RMelocaServer/1.0");
         header.addAttribute("Content-Type", "application/json");
@@ -269,8 +289,8 @@ public class Worker implements Runnable {
         String dateGMT = getDateGTM();
 
         HTTPHeader header = new HTTPHeader();
-        header.addAttribute("Location", "http://localhost:8080/");
         header.addAttribute("Date", dateGMT);
+        header.addAttribute("Location", "http://localhost:" + Server.PORT + "/");
         header.addAttribute("Server", "RMelocaServer/1.0");
         header.addAttribute("Content-Type", "application/json");
         header.addAttribute("Content-Length", String.valueOf(content.length));
