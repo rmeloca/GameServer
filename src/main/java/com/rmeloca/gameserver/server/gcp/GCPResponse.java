@@ -11,16 +11,16 @@ package com.rmeloca.gameserver.server.gcp;
  */
 public class GCPResponse {
 
-    private final GCPCode code;
+    private final GCPCode response;
     private final Object data;
 
-    public GCPResponse(GCPCode code) {
-        this.code = code;
+    public GCPResponse(GCPCode response) {
+        this.response = response;
         this.data = "";
     }
 
-    public GCPResponse(GCPCode code, Object data) {
-        this.code = code;
+    public GCPResponse(GCPCode response, Object data) {
+        this.response = response;
         this.data = data;
     }
 

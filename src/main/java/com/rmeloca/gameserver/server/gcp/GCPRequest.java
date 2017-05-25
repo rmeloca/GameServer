@@ -11,22 +11,22 @@ package com.rmeloca.gameserver.server.gcp;
  */
 public class GCPRequest {
 
-    private final String station;
-    private final String operation;
+    private final String id;
+    private final String op;
     private Object data;
 
-    public GCPRequest(String station, GCPOperation operation, Object data) {
-        this.station = station;
-        this.operation = operation.name();
+    public GCPRequest(String station, GCPOperation op, Object data) {
+        this.id = station;
+        this.op = op.toString();
         this.data = data;
     }
 
-    public String getStation() {
-        return station;
+    public String getId() {
+        return id;
     }
 
     public GCPOperation getOperation() {
-        return GCPOperation.valueOf(operation);
+        return GCPOperation.valueOf(op.toUpperCase().replace("-", "_"));
     }
 
     public Object getData() {

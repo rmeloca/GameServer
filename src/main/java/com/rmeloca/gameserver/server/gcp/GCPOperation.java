@@ -11,4 +11,21 @@ package com.rmeloca.gameserver.server.gcp;
  */
 public enum GCPOperation {
     ADD_TROPHY, LIST_TROPHY, CLEAR_TROPHY, ADD_PLAYER;
+
+    @Override
+    public String toString() {
+        switch (this) {
+            case ADD_TROPHY:
+                return "add-trophy";
+            case LIST_TROPHY:
+                return "list-trophy";
+            case CLEAR_TROPHY:
+                return "clear-trophy";
+            case ADD_PLAYER:
+                return "add-player";
+            default:
+                throw new AssertionError(this.name());
+        }
+    }
+
 }

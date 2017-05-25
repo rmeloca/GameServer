@@ -74,7 +74,7 @@ public class GameHandler {
     protected GCPResponse postGameResource(HTTPRequest request, String path) {
         Gson gson = new Gson();
         GCPRequest gcpRequest = gson.fromJson(request.getContent(), GCPRequest.class);
-        String station = gcpRequest.getStation();
+        String station = gcpRequest.getId();
         Profile profile;
         try {
             profile = game.getProfile(new Profile(station));
