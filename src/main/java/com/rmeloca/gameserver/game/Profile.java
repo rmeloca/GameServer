@@ -15,11 +15,13 @@ import java.util.ArrayList;
 public class Profile implements Serializable {
 
     private final String name;
+    private int score;
     private final ArrayList<Trophy> trophies;
 
     public Profile(String name) {
         this.name = name;
         this.trophies = new ArrayList<>();
+        this.score = 0;
     }
 
     public String getName() {
@@ -61,6 +63,12 @@ public class Profile implements Serializable {
         dump.append("\"").append(getName()).append("\"");
         dump.append("}");
         return dump.toString();
+    }
+
+    public void addScore(int score) {
+        if (score > 0) {
+            this.score += score;
+        }
     }
 
 }

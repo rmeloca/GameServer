@@ -26,7 +26,8 @@ public class GCPRequest {
     }
 
     public GCPOperation getOperation() {
-        return GCPOperation.valueOf(op.toUpperCase().replace("-", "_"));
+        String operation = op.toUpperCase().replace("-", "_");
+        return GCPOperation.valueOf(operation);
     }
 
     public Object getData() {
