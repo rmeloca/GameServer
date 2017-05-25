@@ -95,6 +95,8 @@ public class GameHandler {
             case ADD_SCORE:
                 int score = gson.fromJson(request.getContent(), JsonObject.class).get("score").getAsInt();
                 profile.addScore(score);
+                gcpResponse = new GCPResponse(GCPCode.OK);
+                break;
             case ADD_TROPHY:
                 JsonObject objectTrophy = gson.fromJson(request.getContent(), JsonObject.class).get("data").getAsJsonObject();
                 Trophy trophy = gson.fromJson(objectTrophy, Trophy.class);
