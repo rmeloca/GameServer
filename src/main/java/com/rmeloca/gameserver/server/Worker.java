@@ -12,14 +12,9 @@ import com.rmeloca.gameserver.server.http.HTTPCode;
 import com.rmeloca.gameserver.server.http.HTTPHeader;
 import com.rmeloca.gameserver.server.http.HTTPRequest;
 import com.rmeloca.gameserver.server.http.HTTPResponse;
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -250,6 +245,7 @@ public class Worker implements Runnable {
         if (object != null) {
             Gson gson = new Gson();
             String toJson = gson.toJson(object);
+            toJson = toJson.toLowerCase();
             content = toJson.getBytes();
         } else {
             content = "".getBytes();

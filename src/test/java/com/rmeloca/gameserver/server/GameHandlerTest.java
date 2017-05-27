@@ -6,7 +6,6 @@
 package com.rmeloca.gameserver.server;
 
 import com.google.gson.Gson;
-import com.rmeloca.gameserver.server.gcp.GCPCode;
 import com.rmeloca.gameserver.server.gcp.GCPOperation;
 import com.rmeloca.gameserver.server.gcp.GCPRequest;
 import org.junit.Test;
@@ -23,7 +22,7 @@ public class GameHandlerTest {
 
     @Test
     public void testSomeMethod() {
-        String json = "{\"station\":\"john_doe\",\"operation\":\"ADD_TROPHY\", \"data\":\"\"}";
+        String json = "{\"id\":\"john_doe\",\"op\":\"add-trophy\", \"data\":\"\"}";
         Gson gson = new Gson();
         GCPRequest gcpRequest = gson.fromJson(json, GCPRequest.class);
         GCPOperation operation = gcpRequest.getOperation();

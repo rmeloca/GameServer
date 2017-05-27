@@ -27,7 +27,9 @@ public class Server {
 
     public static void main(String argv[]) {
         if (argv.length < 1) {
-            Server.PORT = 8080;
+            Server.PORT = 8000;
+        } else {
+            Server.PORT = Integer.parseInt(argv[0]);
         }
 
         GameController gameController = new GameController();
