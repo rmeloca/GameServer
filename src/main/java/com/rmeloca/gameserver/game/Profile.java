@@ -14,12 +14,14 @@ import java.util.ArrayList;
  */
 public class Profile implements Serializable {
 
+    private final int id;
     private final String name;
     private int score;
     private final ArrayList<Trophy> trophies;
 
-    public Profile(String name) {
-        this.name = name;
+    public Profile(int id) {
+        this.id = id;
+        this.name = null;
         this.trophies = new ArrayList<>();
         this.score = 0;
     }

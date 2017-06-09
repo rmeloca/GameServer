@@ -5,8 +5,8 @@
 # Maven deploy
 /target/
 
-# Server folder
-/resources
+# Resources folder
+/resources/
 
 # Class files
 *.class

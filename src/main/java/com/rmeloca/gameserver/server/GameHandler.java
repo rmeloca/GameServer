@@ -56,11 +56,13 @@ public class GameHandler {
                 data = game.getProfiles();
                 code = GCPCode.OK;
             } else {
-                String profileName = url[3];
+                String profileID = url[3];
                 try {
-                    data = game.getProfile(new Profile(profileName));
+                    data = game.getProfile(new Profile(Integer.valueOf(profileID)));
                     code = GCPCode.OK;
                 } catch (ItemNotFoundException ex) {
+                    Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NumberFormatException ex) {
                     Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -75,12 +77,12 @@ public class GameHandler {
     protected GCPResponse postGameResource(HTTPRequest request, String path) {
         Gson gson = new Gson();
         GCPRequest gcpRequest = gson.fromJson(request.getContent(), GCPRequest.class);
-        String station = gcpRequest.getId();
+        int id = gcpRequest.getId();
         Profile profile;
         try {
-            profile = game.getProfile(new Profile(station));
+            profile = game.getProfile(new Profile(id));
         } catch (ItemNotFoundException ex) {
-            profile = new Profile(station);
+            profile = new Profile(id);
             game.addProfile(profile);
             try {
                 GameController gameController = new GameController();

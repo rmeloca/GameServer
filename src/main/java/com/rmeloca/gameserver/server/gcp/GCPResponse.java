@@ -10,7 +10,7 @@ package com.rmeloca.gameserver.server.gcp;
  * @author romulo
  */
 public class GCPResponse {
-
+   
     private final GCPCode response;
     private final Object data;
 

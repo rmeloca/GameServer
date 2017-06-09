@@ -27,7 +27,7 @@ public class GameControllerTest {
         GameController gameController = new GameController();
         try {
             Game get = gameController.get(new Game(1));
-            Profile profile = new Profile(String.valueOf(System.currentTimeMillis()));
+            Profile profile = new Profile((int) System.currentTimeMillis());
             get.addProfile(profile);
             gameController.update(get);
         } catch (ItemNotFoundException ex) {
