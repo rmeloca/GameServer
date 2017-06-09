@@ -7,7 +7,7 @@ services:
       - ./resources:/GameServer/resources
       - ./configurations:/GameServer/configurations
     ports:
-      - 8080:8080
+      - 80:80
     environment:
       - DB_URL=/GameServer/configurations/database
       - RESOURCES_PATH=/GameServer/resources
