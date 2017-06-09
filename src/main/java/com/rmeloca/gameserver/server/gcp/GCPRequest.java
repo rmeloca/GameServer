@@ -11,19 +11,19 @@ package com.rmeloca.gameserver.server.gcp;
  */
 public class GCPRequest {
 
-    private final int id;
+    private final String id;
     private final int game;
     private final String op;
     private Object data;
 
-    public GCPRequest(int id, int game, GCPOperation op, Object data) {
+    public GCPRequest(String id, int game, GCPOperation op, Object data) {
         this.id = id;
         this.game = game;
         this.op = op.toString();
         this.data = data;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

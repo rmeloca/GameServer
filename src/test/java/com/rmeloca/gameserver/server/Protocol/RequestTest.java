@@ -24,13 +24,13 @@ public class RequestTest {
 
     @Test
     public void testSomeMethod() {
-        Profile profile = new Profile(1);
+        Profile profile = new Profile("leonardo");
         Trophy trophy = new Trophy("first-dead");
         trophy.setDescription("first-dead");
         trophy.setExperience(2);
         trophy.setTittle("first-dead");
         String toString = trophy.toString();
-        GCPRequest request = new GCPRequest(1, 2, GCPOperation.ADD_TROPHY, toString);
+        GCPRequest request = new GCPRequest("leonardo", 2, GCPOperation.ADD_TROPHY, toString);
         Gson gson = new Gson();
         String toJson = gson.toJson(request);
         System.out.println(toJson);
