@@ -93,14 +93,8 @@ public class GameHandler {
             Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
         GCPOperation operation = gcpRequest.getOperation();
-        GCPResponse gcpResponse;
+        GCPResponse gcpResponse = null;
         switch (operation) {
-            case ADD_SCORE:
-                LinkedTreeMap data = (LinkedTreeMap) gcpRequest.getData();
-                Double score = (Double) data.get("score");
-                profile.addScore(score.intValue());
-                gcpResponse = new GCPResponse(GCPCode.OK);
-                break;
             case ADD_TROPHY:
                 JsonObject objectTrophy = gson.fromJson(request.getContent(), JsonObject.class).get("data").getAsJsonObject();
                 Trophy trophy = gson.fromJson(objectTrophy, Trophy.class);
@@ -114,8 +108,26 @@ public class GameHandler {
             case CLEAR_TROPHY:
                 gcpResponse = new GCPResponse(GCPCode.OK);
                 break;
-            case ADD_PLAYER:
+            case ADD_PROFILE:
                 gcpResponse = new GCPResponse(GCPCode.OK);
+                break;
+            case QUERY_PROFILE:
+                break;
+            case ADD_GAME:
+                break;
+            case GET_TROPHY:
+                break;
+            case SAVE_STATE:
+                LinkedTreeMap data = (LinkedTreeMap) gcpRequest.getData();
+                Double score = (Double) data.get("score");
+                profile.addScore(score.intValue());
+                gcpResponse = new GCPResponse(GCPCode.OK);
+                break;
+            case LOAD_STATE:
+                break;
+            case SAVE_MEDIA:
+                break;
+            case LIST_MEDIA:
                 break;
             default:
                 throw new AssertionError(operation.name());
