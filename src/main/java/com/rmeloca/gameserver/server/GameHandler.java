@@ -40,9 +40,9 @@ public class GameHandler {
             try {
                 gameController.add(game);
             } catch (ItemAlreadyExistException ex1) {
-                Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex1);
             }
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.game = game;
     }
@@ -61,9 +61,9 @@ public class GameHandler {
                     data = game.getProfile(new Profile(profileID));
                     code = GCPCode.OK;
                 } catch (ItemNotFoundException ex) {
-                    Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (NumberFormatException ex) {
-                    Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         } else if (path.startsWith("/game")) {

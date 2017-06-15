@@ -6,6 +6,7 @@
 package com.rmeloca.gameserver.server;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.rmeloca.gameserver.server.gcp.GCPResponse;
 import com.rmeloca.gameserver.server.http.HTTPCode;
@@ -31,19 +32,19 @@ import java.util.logging.Logger;
  *
  * @author romulo
  */
-public class Worker implements Runnable {
+public class HTTPWorker implements Runnable {
 
     private Socket clientSocket;
     private InputStream inputStream;
     private OutputStream outputStream;
 
-    public Worker(Socket clientSocket) {
+    public HTTPWorker(Socket clientSocket) {
         this.clientSocket = clientSocket;
         try {
             this.inputStream = this.clientSocket.getInputStream();
             this.outputStream = this.clientSocket.getOutputStream();
         } catch (IOException ex) {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException();
         }
     }
@@ -52,7 +53,7 @@ public class Worker implements Runnable {
     public void run() {
         try {
             HTTPRequest httpRequest = new HTTPRequest(this.inputStream);
-            Logger.getLogger(Worker.class.getName()).log(Level.INFO, "{0} {1}", new Object[]{httpRequest.getMethod().name(), httpRequest.getResource()});
+            Logger.getLogger(HTTPWorker.class.getName()).log(Level.INFO, "{0} {1}", new Object[]{httpRequest.getMethod().name(), httpRequest.getResource()});
             String path;
             HTTPResponse httpResponse;
             switch (httpRequest.getMethod()) {
@@ -92,25 +93,25 @@ public class Worker implements Runnable {
                     throw new AssertionError(httpRequest.getMethod().name());
             }
             httpResponse.send(this.outputStream);
-            Logger.getLogger(Worker.class.getName()).log(Level.INFO, "{0} {1}", new Object[]{String.valueOf(httpResponse.getCode()), path});
+            Logger.getLogger(HTTPWorker.class.getName()).log(Level.INFO, "{0} {1}", new Object[]{String.valueOf(httpResponse.getCode()), path});
         } catch (IOException ex) {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
                 this.inputStream.close();
             } catch (IOException ex) {
-                Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
                 this.outputStream.close();
             } catch (IOException ex) {
-                Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
-                Logger.getLogger(Worker.class.getName()).log(Level.INFO, "Connection Closed");
+                Logger.getLogger(HTTPWorker.class.getName()).log(Level.INFO, "Connection Closed");
                 this.clientSocket.close();
             } catch (IOException ex) {
-                Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -148,7 +149,7 @@ public class Worker implements Runnable {
             inputStream.read(read);
             return read;
         } catch (IOException ex) {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
@@ -163,7 +164,7 @@ public class Worker implements Runnable {
         String dateGMT = getDateGTM();
 
         HTTPHeader header = new HTTPHeader();
-        header.addAttribute("Location", "http://localhost:" + Server.PORT + "/");
+        header.addAttribute("Location", "http://localhost:" + GameServer.GAME_SERVER_PORT + "/");
         header.addAttribute("Date", dateGMT);
         header.addAttribute("Server", "RMelocaServer/1.0");
         header.addAttribute("Content-Type", type);
@@ -179,7 +180,7 @@ public class Worker implements Runnable {
         String protocol;
         byte[] content;
 
-        File file = new File(Server.RESOURCES_PATH, path);
+        File file = new File(GameServer.RESOURCES_PATH, path);
         if (file.exists()) {
             code = HTTPCode.OK;
             message = "OK";
@@ -187,7 +188,7 @@ public class Worker implements Runnable {
             code = HTTPCode.NOT_FOUND;
             message = "Not Found";
             type = "text/html";
-            file = new File(Server.RESOURCES_PATH, "404.html");
+            file = new File(GameServer.RESOURCES_PATH, "404.html");
         }
         protocol = request.getProtocol();
         byte[] fileContent = Files.readAllBytes(file.toPath());
@@ -209,7 +210,7 @@ public class Worker implements Runnable {
         content = byteArrayOutputStream.toByteArray();
 
         HTTPHeader header = new HTTPHeader();
-        header.addAttribute("Location", "http://localhost:" + Server.PORT + "/");
+        header.addAttribute("Location", "http://localhost:" + GameServer.GAME_SERVER_PORT + "/");
         header.addAttribute("Date", dateGMT);
         header.addAttribute("Server", "RMelocaServer/1.0");
         header.addAttribute("Content-Type", type);
@@ -243,7 +244,7 @@ public class Worker implements Runnable {
         byte[] content;
 
         if (object != null) {
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String toJson = gson.toJson(object);
             toJson = toJson.toLowerCase();
             content = toJson.getBytes();
@@ -257,7 +258,7 @@ public class Worker implements Runnable {
         String dateGMT = getDateGTM();
 
         HTTPHeader header = new HTTPHeader();
-        header.addAttribute("Location", "http://localhost:" + Server.PORT + "/");
+        header.addAttribute("Location", "http://localhost:" + GameServer.GAME_SERVER_PORT + "/");
         header.addAttribute("Date", dateGMT);
         header.addAttribute("Server", "RMelocaServer/1.0");
         header.addAttribute("Content-Type", "application/json");
@@ -286,7 +287,7 @@ public class Worker implements Runnable {
 
         HTTPHeader header = new HTTPHeader();
         header.addAttribute("Date", dateGMT);
-        header.addAttribute("Location", "http://localhost:" + Server.PORT + "/");
+        header.addAttribute("Location", "http://localhost:" + GameServer.GAME_SERVER_PORT + "/");
         header.addAttribute("Server", "RMelocaServer/1.0");
         header.addAttribute("Content-Type", "application/json");
         header.addAttribute("Content-Length", String.valueOf(content.length));
@@ -297,7 +298,7 @@ public class Worker implements Runnable {
 
     private JsonObject buildJSONFolder(String path) throws FileNotFoundException {
         JsonObject jsonFolder = new JsonObject();
-        File folder = new File(Server.RESOURCES_PATH, path);
+        File folder = new File(GameServer.RESOURCES_PATH, path);
         if (!folder.exists()) {
             throw new FileNotFoundException();
         }
@@ -331,7 +332,7 @@ public class Worker implements Runnable {
     }
 
     private boolean resourceExists(String path) {
-        File file = new File(Server.RESOURCES_PATH, path);
+        File file = new File(GameServer.RESOURCES_PATH, path);
         return file.exists();
     }
 }

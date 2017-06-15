@@ -20,16 +20,16 @@ import java.util.logging.Logger;
  *
  * @author romulo
  */
-public class Server {
+public class GameServer {
 
     public static final String RESOURCES_PATH = System.getenv("RESOURCES_PATH") != null ? System.getenv("RESOURCES_PATH") : "./resources/";
-    public static int PORT;
+    public static int GAME_SERVER_PORT;
 
     public static void main(String argv[]) {
         if (argv.length < 1) {
-            Server.PORT = 8080;
+            GameServer.GAME_SERVER_PORT = 8888;
         } else {
-            Server.PORT = Integer.parseInt(argv[0]);
+            GameServer.GAME_SERVER_PORT = Integer.parseInt(argv[0]);
         }
 
         GameController gameController = new GameController();
@@ -37,27 +37,30 @@ public class Server {
         try {
             gameController.add(game);
         } catch (ItemAlreadyExistException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GameServer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Logger.getLogger(Server.class.getName()).log(Level.INFO, "Server is Running");
+        Logger.getLogger(GameServer.class.getName()).log(Level.INFO, "Server is Running");
         ServerSocket serverSocket = null;
         try {
-            serverSocket = new ServerSocket(Server.PORT);
-            ExecutorService pool = Executors.newFixedThreadPool(20);
+            serverSocket = new ServerSocket(GameServer.GAME_SERVER_PORT);
+            ExecutorService httpWorkerPool = Executors.newFixedThreadPool(20);
+            Synchronizer synchronizer = new Synchronizer();
+            Thread synchronizerThread = new Thread(synchronizer);
+            synchronizerThread.start();
             while (true) {
                 Socket socket = serverSocket.accept();
-                Logger.getLogger(Server.class.getName()).log(Level.INFO, "{0} conectou-se", socket.getInetAddress());
-                Worker worker = new Worker(socket);
-                pool.execute(worker);
+                Logger.getLogger(GameServer.class.getName()).log(Level.INFO, "{0} conectou-se", socket.getInetAddress());
+                HTTPWorker worker = new HTTPWorker(socket);
+                httpWorkerPool.execute(worker);
             }
         } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GameServer.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            if (!serverSocket.isClosed()) {
+            if (serverSocket != null && !serverSocket.isClosed()) {
                 try {
                     serverSocket.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GameServer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
