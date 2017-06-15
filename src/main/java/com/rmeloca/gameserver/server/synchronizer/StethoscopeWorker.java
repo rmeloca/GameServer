@@ -35,7 +35,7 @@ public class StethoscopeWorker implements Runnable {
                 DatagramPacket heartbeatDatagramPacket = new DatagramPacket(buffer, buffer.length);
                 multicastSocket.receive(heartbeatDatagramPacket);
                 InetAddress address = heartbeatDatagramPacket.getAddress();
-                this.synchronizer.addFriend(address);
+                this.synchronizer.meetFriend(new Friend(address, System.currentTimeMillis()));
             } catch (IOException ex) {
                 Logger.getLogger(HeartbeatWorker.class.getName()).log(Level.SEVERE, null, ex);
             }

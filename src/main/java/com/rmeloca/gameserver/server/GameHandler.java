@@ -77,23 +77,17 @@ public class GameHandler {
     protected GCPResponse postGameResource(HTTPRequest request, String path) {
         Gson gson = new Gson();
         GCPRequest gcpRequest = gson.fromJson(request.getContent(), GCPRequest.class);
-        String id = gcpRequest.getId();
-        Profile profile;
-        try {
-            profile = game.getProfile(new Profile(id));
-        } catch (ItemNotFoundException ex) {
-            profile = new Profile(id);
-            game.addProfile(profile);
-            try {
-                GameController gameController = new GameController();
-                gameController.update(game);
-            } catch (ItemNotFoundException ex1) {
-                Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
         GCPOperation operation = gcpRequest.getOperation();
         GCPResponse gcpResponse = null;
+        
+        String id = gcpRequest.getId();
+        Profile profile = new Profile(id);
+        try {
+            profile = game.getProfile(profile);
+        } catch (ItemNotFoundException ex) {
+            Synchronizer synchronizer = GameServer.getSynchronizer();
+            synchronizer.askToFriends(gcpRequest);
+        }
         switch (operation) {
             case ADD_TROPHY:
                 JsonObject objectTrophy = gson.fromJson(request.getContent(), JsonObject.class).get("data").getAsJsonObject();
@@ -112,6 +106,7 @@ public class GameHandler {
                 gcpResponse = new GCPResponse(GCPCode.OK);
                 break;
             case QUERY_PROFILE:
+                gcpResponse = new GCPResponse(GCPCode.OK, profile);
                 break;
             case ADD_GAME:
                 break;

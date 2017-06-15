@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class Profile implements Serializable {
 
     private final String id;
+    private String password;
     private int score;
     private final ArrayList<Trophy> trophies;
 

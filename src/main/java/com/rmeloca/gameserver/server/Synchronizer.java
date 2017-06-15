@@ -5,14 +5,18 @@
  */
 package com.rmeloca.gameserver.server;
 
+import com.rmeloca.gameserver.server.gcp.GCPRequest;
+import com.rmeloca.gameserver.server.gcp.GCPResponse;
+import com.rmeloca.gameserver.server.synchronizer.Friend;
 import com.rmeloca.gameserver.server.synchronizer.HeartbeatWorker;
+import com.rmeloca.gameserver.server.synchronizer.KeepAliveOnesWorker;
 import com.rmeloca.gameserver.server.synchronizer.StethoscopeWorker;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,32 +28,59 @@ public class Synchronizer implements Runnable {
 
     private static final int MULTICAST_PORT = 8889;
     private static final String MULTICAST_IP = "255.1.2.3";
-    private final Map<InetAddress, Long> friendList;
+    private final List<Friend> friendList;
     private final StethoscopeWorker stethoscopeWorker;
     private final HeartbeatWorker heartbeatWorker;
+    private final KeepAliveOnesWorker keepAliveOnesWorker;
 
     public Synchronizer() {
         try {
             MulticastSocket multicastSocket = new MulticastSocket(MULTICAST_PORT);
             multicastSocket.joinGroup(InetAddress.getByName(MULTICAST_IP));
-            stethoscopeWorker = new StethoscopeWorker(multicastSocket, this);
-            heartbeatWorker = new HeartbeatWorker(multicastSocket);
+            this.stethoscopeWorker = new StethoscopeWorker(multicastSocket, this);
+            this.heartbeatWorker = new HeartbeatWorker(multicastSocket);
+            this.keepAliveOnesWorker = new KeepAliveOnesWorker(this);
         } catch (IOException ex) {
             Logger.getLogger(Synchronizer.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException();
         }
-        this.friendList = new HashMap<>();
+        this.friendList = new ArrayList<>();
     }
 
     @Override
     public void run() {
         Thread stethoscopeThread = new Thread(this.stethoscopeWorker);
         Thread heartbeatThread = new Thread(this.heartbeatWorker);
+        Thread keepAliveOnesThread = new Thread(this.keepAliveOnesWorker);
         heartbeatThread.start();
         stethoscopeThread.start();
+        keepAliveOnesThread.start();
     }
 
-    public void addFriend(InetAddress inetAddress) {
-        this.friendList.put(inetAddress, System.currentTimeMillis());
+    public void meetFriend(Friend friend) {
+        for (Friend myFriend : this.friendList) {
+            if (myFriend.equals(friend)) {
+                myFriend.meet(friend.getLastMeeting());
+                return;
+            }
+        }
+        this.friendList.add(friend);
+    }
+
+    public List<Friend> getFriends() {
+        return this.friendList;
+    }
+
+    public GCPResponse askToFriends(GCPRequest gcpRequest) {
+        for (Friend friend : friendList) {
+            Thread askThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    friend.ask(gcpRequest);
+                }
+            });
+            return friend.ask(gcpRequest);
+        }
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

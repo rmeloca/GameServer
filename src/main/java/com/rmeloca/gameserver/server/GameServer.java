@@ -24,6 +24,11 @@ public class GameServer {
 
     public static final String RESOURCES_PATH = System.getenv("RESOURCES_PATH") != null ? System.getenv("RESOURCES_PATH") : "./resources/";
     public static int GAME_SERVER_PORT;
+    private static Synchronizer synchronizer;
+
+    public static Synchronizer getSynchronizer() {
+        return synchronizer;
+    }
 
     public static void main(String argv[]) {
         if (argv.length < 1) {
@@ -44,7 +49,7 @@ public class GameServer {
         try {
             serverSocket = new ServerSocket(GameServer.GAME_SERVER_PORT);
             ExecutorService httpWorkerPool = Executors.newFixedThreadPool(20);
-            Synchronizer synchronizer = new Synchronizer();
+            synchronizer = new Synchronizer();
             Thread synchronizerThread = new Thread(synchronizer);
             synchronizerThread.start();
             while (true) {
