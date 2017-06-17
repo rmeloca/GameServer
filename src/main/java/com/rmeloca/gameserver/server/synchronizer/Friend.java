@@ -5,9 +5,12 @@
  */
 package com.rmeloca.gameserver.server.synchronizer;
 
+import com.google.gson.Gson;
 import com.rmeloca.gameserver.server.GameServer;
 import com.rmeloca.gameserver.server.gcp.GCPRequest;
 import com.rmeloca.gameserver.server.gcp.GCPResponse;
+import com.rmeloca.gameserver.server.http.HTTPCode;
+import com.rmeloca.gameserver.server.http.HTTPResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +41,7 @@ public class Friend {
     }
 
     public Friend(InetAddress address, long meetingTime) throws MalformedURLException {
-        this.address = new URL(address.getHostAddress());
+        this.address = new URL("http://" + address.getHostAddress() + ":" + GameServer.GAME_SERVER_PORT + "/game");
         this.lastMeeting = meetingTime;
     }
 
@@ -57,13 +61,15 @@ public class Friend {
 
     public GCPResponse ask(GCPRequest gcpRequest) {
         try {
-            URL url = new URL(address.getHost() + ":" + GameServer.GAME_SERVER_PORT);
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection httpURLConnection = (HttpURLConnection) this.address.openConnection();
             httpURLConnection.setRequestMethod("POST");
             httpURLConnection.setDoOutput(true);
+            Gson gson = new Gson();
+            String toJson = gson.toJson(gcpRequest);
             try (OutputStream outputStream = httpURLConnection.getOutputStream()) {
-                outputStream.write(1);
-                InputStream inputStream = httpURLConnection.getInputStream();
+                outputStream.write(toJson.getBytes());
+            }
+            try (InputStream inputStream = httpURLConnection.getInputStream()) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 Stream<String> lines = bufferedReader.lines();

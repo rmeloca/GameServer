@@ -65,7 +65,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix> 
-                            <mainClass>com.rmeloca.gameserver.server.Server</mainClass> 
+                            <mainClass>com.rmeloca.gameserver.server.GameServer</mainClass> 
                         </manifest>
                         <manifestEntries>
                             <Class-Path>lib/</Class-Path>
