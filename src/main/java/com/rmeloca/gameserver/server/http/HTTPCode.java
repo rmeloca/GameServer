@@ -13,7 +13,13 @@ public enum HTTPCode {
     OK(200),
     NOT_FOUND(404);
 
-    private HTTPCode(int number) {
+    private final int value;
+
+    private HTTPCode(int value) {
+        this.value = value;
     }
 
+    public int getValue() {
+        return this.value;
+    }
 }
