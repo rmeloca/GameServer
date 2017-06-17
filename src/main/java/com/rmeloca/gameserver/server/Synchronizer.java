@@ -5,6 +5,7 @@
  */
 package com.rmeloca.gameserver.server;
 
+import com.rmeloca.gameserver.server.gcp.GCPCode;
 import com.rmeloca.gameserver.server.gcp.GCPRequest;
 import com.rmeloca.gameserver.server.gcp.GCPResponse;
 import com.rmeloca.gameserver.server.synchronizer.Friend;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,18 +72,13 @@ public class Synchronizer implements Runnable {
     }
 
     public GCPResponse askToFriends(GCPRequest gcpRequest) {
-        Collection<Thread> askThreads = new ArrayList<>();
+        GCPResponse response = new GCPResponse(GCPCode.ERROR);
         for (Friend friend : friendList) {
-            Thread askThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    friend.ask(gcpRequest);
-                }
-            });
-            askThreads.add(askThread);
-
-            return friend.ask(gcpRequest);
+            response = friend.ask(gcpRequest);
+            if (response.getResponse().equals(GCPCode.OK)) {
+                return response;
+            }
         }
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return response;
     }
 }

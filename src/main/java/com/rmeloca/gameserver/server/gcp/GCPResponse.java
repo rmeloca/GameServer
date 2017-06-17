@@ -10,7 +10,7 @@ package com.rmeloca.gameserver.server.gcp;
  * @author romulo
  */
 public class GCPResponse {
-   
+
     private final GCPCode response;
     private final Object data;
 
@@ -22,6 +22,10 @@ public class GCPResponse {
     public GCPResponse(GCPCode response, Object data) {
         this.response = response;
         this.data = data;
+    }
+
+    public GCPCode getResponse() {
+        return response;
     }
 
 }

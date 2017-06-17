@@ -10,5 +10,5 @@ package com.rmeloca.gameserver.server.gcp;
  * @author romulo
  */
 public enum GCPCode {
-    OK, FAIL;
+    OK, FAIL, ERROR;
 }
