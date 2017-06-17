@@ -7,10 +7,9 @@ package com.rmeloca.gameserver.server.synchronizer;
 
 import com.google.gson.Gson;
 import com.rmeloca.gameserver.server.GameServer;
+import com.rmeloca.gameserver.server.gcp.GCPCode;
 import com.rmeloca.gameserver.server.gcp.GCPRequest;
 import com.rmeloca.gameserver.server.gcp.GCPResponse;
-import com.rmeloca.gameserver.server.http.HTTPCode;
-import com.rmeloca.gameserver.server.http.HTTPResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +19,6 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,17 +72,20 @@ public class Friend {
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 Stream<String> lines = bufferedReader.lines();
                 Iterator<String> iterator = lines.iterator();
+                StringBuilder jsonResponse = new StringBuilder();
                 while (iterator.hasNext()) {
                     String next = iterator.next();
-                    System.out.println(next);
+                    jsonResponse.append(next);
                 }
+                GCPResponse gcpResponse = gson.fromJson(jsonResponse.toString(), GCPResponse.class);
+                return gcpResponse;
             }
         } catch (MalformedURLException ex) {
             Logger.getLogger(Friend.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(Friend.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
+        return new GCPResponse(GCPCode.FAIL);
     }
 
     @Override
@@ -95,5 +96,4 @@ public class Friend {
         Friend other = (Friend) obj;
         return this.address.equals(other.address);
     }
-
 }

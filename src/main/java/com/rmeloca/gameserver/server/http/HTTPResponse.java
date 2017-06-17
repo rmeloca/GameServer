@@ -44,14 +44,13 @@ public class HTTPResponse {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(this.protocol).append(" ").append(this.code.getValue()).append(" ").append(this.code).append("\r\n");
+        stringBuilder.append(this.protocol).append(" ").append(this.code.getValue()).append(" ").append(this.message).append("\r\n");
         for (Map.Entry<String, List<String>> entry : this.header) {
             stringBuilder.append(entry.getKey());
             String valueArray = Arrays.toString(entry.getValue().toArray()).replace("[", "").replace("]", "");
             stringBuilder.append(": ").append(valueArray).append("\r\n");
         }
         stringBuilder.append("\r\n");
-        stringBuilder.append(this.message);
         return stringBuilder.toString();
     }
 }

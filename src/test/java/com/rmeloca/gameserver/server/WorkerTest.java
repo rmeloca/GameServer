@@ -39,7 +39,7 @@ public class WorkerTest {
             httpURLConnection.setRequestMethod("POST");
             httpURLConnection.setDoOutput(true);
             try (OutputStream outputStream = httpURLConnection.getOutputStream()) {
-                HTTPResponse hTTPResponse = new HTTPResponse("GET", HTTPCode.OK, "message", "leonardo".getBytes(), new HTTPHeader());
+                HTTPResponse hTTPResponse = new HTTPResponse("GET", HTTPCode.OK, "OK", "leonardo".getBytes(), new HTTPHeader());
                 hTTPResponse.send(outputStream);
                 InputStream inputStream = httpURLConnection.getInputStream();
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);

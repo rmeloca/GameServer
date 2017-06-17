@@ -37,5 +37,4 @@ public class FriendTest {
             Logger.getLogger(FriendTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
 }
