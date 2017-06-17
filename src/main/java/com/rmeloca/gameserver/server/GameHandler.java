@@ -78,17 +78,22 @@ public class GameHandler {
         Gson gson = new Gson();
         GCPRequest gcpRequest = gson.fromJson(request.getContent(), GCPRequest.class);
         GCPOperation operation = gcpRequest.getOperation();
+        GCPResponse gcpResponse = null;
 
         String id = gcpRequest.getId();
         Profile profile = new Profile(id);
         try {
             profile = game.getProfile(profile);
         } catch (ItemNotFoundException ex) {
-            Synchronizer synchronizer = GameServer.getSynchronizer();
-//            synchronizer.askToFriends(gcpRequest);
+            if (operation.equals(GCPOperation.ADD_PROFILE)) {
+                game.addProfile(profile);
+            } else {
+                Synchronizer synchronizer = GameServer.getSynchronizer();
+                gcpResponse = synchronizer.askToFriends(gcpRequest);
+                return gcpResponse;
+            }
         }
 
-        GCPResponse gcpResponse = null;
         switch (operation) {
             case ADD_TROPHY:
                 JsonObject objectTrophy = gson.fromJson(request.getContent(), JsonObject.class).get("data").getAsJsonObject();

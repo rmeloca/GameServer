@@ -24,7 +24,7 @@ public class GCPResponse {
         this.data = data;
     }
 
-    public GCPCode getResponse() {
+    public GCPCode getCode() {
         return response;
     }
 

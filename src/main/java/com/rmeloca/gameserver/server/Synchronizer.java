@@ -75,7 +75,7 @@ public class Synchronizer implements Runnable {
         GCPResponse response = new GCPResponse(GCPCode.ERROR);
         for (Friend friend : friendList) {
             response = friend.ask(gcpRequest);
-            if (response.getResponse().equals(GCPCode.OK)) {
+            if (response.getCode().equals(GCPCode.OK)) {
                 return response;
             }
         }
