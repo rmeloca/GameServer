@@ -10,12 +10,10 @@ import com.rmeloca.gameserver.server.gcp.GCPOperation;
 import com.rmeloca.gameserver.server.gcp.GCPRequest;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -32,7 +30,7 @@ public class FriendTest {
         try {
             InetAddress address = InetAddress.getLocalHost();
             Friend friend = new Friend(address, System.currentTimeMillis());
-            friend.ask(new GCPRequest("rmeloca", 0, GCPOperation.ADD_GAME, this));
+            friend.ask(new GCPRequest("rmeloca", 0, GCPOperation.ADD_PROFILE, null));
         } catch (MalformedURLException ex) {
             Logger.getLogger(FriendTest.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnknownHostException ex) {
