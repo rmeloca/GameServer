@@ -5,8 +5,10 @@ package com.rmeloca.gameserver.server.synchronizer;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import com.rmeloca.gameserver.server.Synchronizer;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +30,7 @@ public class HeartbeatWorker implements Runnable {
         while (true) {
             try {
                 byte[] buffer = new byte[0];
-                DatagramPacket heartbeatDatagramPacket = new DatagramPacket(buffer, buffer.length);
+                DatagramPacket heartbeatDatagramPacket = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(Synchronizer.MULTICAST_IP), this.multicastSocket.getLocalPort());
                 multicastSocket.send(heartbeatDatagramPacket);
                 Thread.sleep(10000);
             } catch (IOException | InterruptedException ex) {

@@ -26,8 +26,8 @@ import java.util.logging.Logger;
  */
 public class Synchronizer implements Runnable {
 
-    private static final int MULTICAST_PORT = 8889;
-    private static final String MULTICAST_IP = "225.1.2.3";
+    public static final int MULTICAST_PORT = 8889;
+    public static final String MULTICAST_IP = "225.1.2.3";
     private final List<Friend> friendList;
     private final StethoscopeWorker stethoscopeWorker;
     private final HeartbeatWorker heartbeatWorker;
@@ -81,7 +81,7 @@ public class Synchronizer implements Runnable {
                 }
             });
             askThreads.add(askThread);
-            
+
             return friend.ask(gcpRequest);
         }
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

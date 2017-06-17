@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,13 +37,26 @@ public class StethoscopeWorker implements Runnable {
                 byte[] buffer = new byte[0];
                 DatagramPacket heartbeatDatagramPacket = new DatagramPacket(buffer, buffer.length);
                 multicastSocket.receive(heartbeatDatagramPacket);
-                InetAddress address = heartbeatDatagramPacket.getAddress();
-                if (!address.equals(InetAddress.getLocalHost())) {
+                if (!isMine(heartbeatDatagramPacket)) {
+                    InetAddress address = heartbeatDatagramPacket.getAddress();
                     this.synchronizer.meetFriend(new Friend(address, System.currentTimeMillis()));
                 }
             } catch (IOException ex) {
                 Logger.getLogger(HeartbeatWorker.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    private boolean isMine(DatagramPacket heartbeatDatagramPacket) throws SocketException {
+        InetAddress address = heartbeatDatagramPacket.getAddress();
+        NetworkInterface friendNetwork = NetworkInterface.getByInetAddress(address);
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface nextElement = networkInterfaces.nextElement();
+            if (friendNetwork.equals(nextElement)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
