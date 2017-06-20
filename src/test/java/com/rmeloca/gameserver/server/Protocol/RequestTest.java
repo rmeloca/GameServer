@@ -30,7 +30,7 @@ public class RequestTest {
         trophy.setExperience(2);
         trophy.setTittle("first-dead");
         String toString = trophy.toString();
-        GCPRequest request = new GCPRequest("leonardo", 2, GCPOperation.ADD_TROPHY, toString);
+        GCPRequest request = new GCPRequest("leonardo", "marioevolution", GCPOperation.ADD_TROPHY, toString);
         Gson gson = new Gson();
         String toJson = gson.toJson(request);
         System.out.println(toJson);

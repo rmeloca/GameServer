@@ -26,7 +26,7 @@ public class GameControllerTest {
     public void testSomeMethod() {
         GameController gameController = new GameController();
         try {
-            Game get = gameController.get(new Game(1));
+            Game get = gameController.get(new Game("marioevolution"));
             Profile profile = new Profile("leonardo");
             get.addProfile(profile);
             gameController.update(get);

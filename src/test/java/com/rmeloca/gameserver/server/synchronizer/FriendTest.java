@@ -30,7 +30,7 @@ public class FriendTest {
         try {
             InetAddress address = InetAddress.getLocalHost();
             Friend friend = new Friend(address, System.currentTimeMillis());
-            friend.ask(new GCPRequest("rmeloca", 0, GCPOperation.ADD_PROFILE, null));
+            friend.ask(new GCPRequest("rmeloca", "marioevolution", GCPOperation.ADD_PROFILE, null));
         } catch (MalformedURLException ex) {
             Logger.getLogger(FriendTest.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnknownHostException ex) {
