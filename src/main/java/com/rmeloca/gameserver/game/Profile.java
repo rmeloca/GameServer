@@ -5,6 +5,7 @@
  */
 package com.rmeloca.gameserver.game;
 
+import java.awt.Image;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -17,12 +18,17 @@ public class Profile implements Serializable {
     private final String id;
     private String password;
     private int score;
+    private int level;
+    private Coordinate coordinate;
     private final ArrayList<Trophy> trophies;
+    private final ArrayList<Image> screenshots;
 
     public Profile(String id) {
         this.id = id;
         this.trophies = new ArrayList<>();
         this.score = 0;
+        this.level = 0;
+        this.screenshots = new ArrayList<>();
     }
 
     public String getName() {
@@ -47,6 +53,24 @@ public class Profile implements Serializable {
         }
     }
 
+    public void levelUp() {
+        this.level++;
+    }
+
+    public void addScore(int score) {
+        if (score > 0) {
+            this.score += score;
+        }
+    }
+
+    public void clearTrophy() {
+        this.trophies.clear();
+    }
+
+    public ArrayList<Image> getScreenshots() {
+        return screenshots;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Profile)) {
@@ -65,11 +89,4 @@ public class Profile implements Serializable {
         dump.append("}");
         return dump.toString();
     }
-
-    public void addScore(int score) {
-        if (score > 0) {
-            this.score += score;
-        }
-    }
-
 }

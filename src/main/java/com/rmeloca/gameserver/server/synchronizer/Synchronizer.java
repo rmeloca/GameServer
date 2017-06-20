@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.rmeloca.gameserver.server;
+package com.rmeloca.gameserver.server.synchronizer;
 
 import com.rmeloca.gameserver.server.gcp.GCPCode;
 import com.rmeloca.gameserver.server.gcp.GCPRequest;

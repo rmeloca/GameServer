@@ -16,10 +16,13 @@ import java.util.Collection;
  */
 public class Game implements Serializable {
 
-    private final int id;
+    private final String id;
     private final Collection<Profile> profiles;
 
-    public Game(int id) {
+    public Game(String id) {
+        if (id == null) {
+            throw new RuntimeException();
+        }
         this.id = id;
         this.profiles = new ArrayList<>();
     }
@@ -45,7 +48,7 @@ public class Game implements Serializable {
         addProfile(profile);
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -74,7 +77,7 @@ public class Game implements Serializable {
             return false;
         }
         Game other = (Game) obj;
-        return other.getId() == getId();
+        return other.getId().equals(getId());
     }
 
     @Override

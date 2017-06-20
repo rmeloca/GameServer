@@ -5,9 +5,7 @@
  */
 package com.rmeloca.gameserver.server;
 
-import com.rmeloca.gameserver.controller.GameController;
-import com.rmeloca.gameserver.controller.exception.ItemAlreadyExistException;
-import com.rmeloca.gameserver.game.Game;
+import com.rmeloca.gameserver.server.synchronizer.Synchronizer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -36,14 +34,7 @@ public class GameServer {
         } else {
             GameServer.GAME_SERVER_PORT = Integer.parseInt(argv[0]);
         }
-
-        GameController gameController = new GameController();
-        Game game = new Game(1);
-        try {
-            gameController.add(game);
-        } catch (ItemAlreadyExistException ex) {
-            Logger.getLogger(GameServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
         Logger.getLogger(GameServer.class.getName()).log(Level.INFO, "Server is Running");
         ServerSocket serverSocket = null;
         try {

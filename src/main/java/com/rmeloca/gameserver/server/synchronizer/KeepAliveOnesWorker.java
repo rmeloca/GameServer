@@ -5,7 +5,6 @@
  */
 package com.rmeloca.gameserver.server.synchronizer;
 
-import com.rmeloca.gameserver.server.Synchronizer;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;

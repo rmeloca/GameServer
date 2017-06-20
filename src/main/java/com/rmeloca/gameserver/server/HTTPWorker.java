@@ -59,7 +59,7 @@ public class HTTPWorker implements Runnable {
             switch (httpRequest.getMethod()) {
                 case GET:
                     path = httpRequest.getResource();
-                    if (path.startsWith("/game")) {
+                    if (path.startsWith("/games")) {
                         GameHandler gameHandler = new GameHandler();
                         GCPResponse gcpResponse = gameHandler.getGameResource(path);
                         httpResponse = getJSON(httpRequest, gcpResponse);
@@ -80,7 +80,7 @@ public class HTTPWorker implements Runnable {
                     break;
                 case POST:
                     path = httpRequest.getResource();
-                    if (path.startsWith("/game")) {
+                    if (path.startsWith("/games")) {
                         GameHandler gameHandler = new GameHandler();
                         GCPResponse postGameResource = gameHandler.postGameResource(httpRequest, path);
                         httpResponse = getJSON(httpRequest, postGameResource);

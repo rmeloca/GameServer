@@ -5,11 +5,11 @@
  */
 package com.rmeloca.gameserver.server;
 
+import com.rmeloca.gameserver.server.synchronizer.Synchronizer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;
 import com.rmeloca.gameserver.controller.GameController;
-import com.rmeloca.gameserver.controller.exception.ItemAlreadyExistException;
 import com.rmeloca.gameserver.controller.exception.ItemNotFoundException;
 import com.rmeloca.gameserver.game.Game;
 import com.rmeloca.gameserver.game.Profile;
@@ -29,49 +29,42 @@ import java.util.logging.Logger;
  */
 public class GameHandler {
 
-    private final Game game;
-
-    public GameHandler() {
-        Game game = new Game(1);
-        GameController gameController = new GameController();
-        try {
-            game = gameController.get(game);
-        } catch (ItemNotFoundException ex) {
-            try {
-                gameController.add(game);
-            } catch (ItemAlreadyExistException ex1) {
-                Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        this.game = game;
-    }
-
     protected GCPResponse getGameResource(String path) {
         Object data = "";
-        GCPCode code = GCPCode.OK;
-        if (path.startsWith("/game/profiles")) {
-            String[] url = path.split("/");
-            if (url.length < 4) {
-                data = game.getProfiles();
+        GCPCode code = GCPCode.FAIL;
+
+        GameController gameController = new GameController();
+        Game game = null;
+        String[] url = path.split("/");
+        if (url.length >= 2) {
+            try {
+                String gameID = url[2];
+                game = new Game(gameID);
+                game = gameController.get(game);
+                data = game;
                 code = GCPCode.OK;
-            } else {
-                String profileID = url[3];
-                try {
-                    data = game.getProfile(new Profile(profileID));
-                    code = GCPCode.OK;
-                } catch (ItemNotFoundException ex) {
-                    Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (NumberFormatException ex) {
-                    Logger.getLogger(HTTPWorker.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            } catch (ItemNotFoundException ex) {
+                Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex);
+                return new GCPResponse(code, data);
             }
-        } else if (path.startsWith("/game")) {
-            data = game;
+        }
+        if (url.length >= 3) {
+            data = game.getProfiles();
             code = GCPCode.OK;
         }
-        GCPResponse gcpResponse = new GCPResponse(code, data);
-        return gcpResponse;
+        if (url.length >= 4) {
+            try {
+                String profileID = url[4];
+                Profile profile = new Profile(profileID);
+                data = game.getProfile(profile);
+            } catch (ItemNotFoundException ex) {
+                Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex);
+                code = GCPCode.FAIL;
+                data = "";
+                return new GCPResponse(code, data);
+            }
+        }
+        return new GCPResponse(code, data);
     }
 
     protected GCPResponse postGameResource(HTTPRequest request, String path) {
@@ -80,9 +73,13 @@ public class GameHandler {
         GCPOperation operation = gcpRequest.getOperation();
         GCPResponse gcpResponse = null;
 
-        String id = gcpRequest.getId();
-        Profile profile = new Profile(id);
+        String gameID = gcpRequest.getGameID();
+        String profileID = gcpRequest.getID();
+        Game game = new Game(gameID);
+        Profile profile = new Profile(profileID);
+        GameController gameController = new GameController();
         try {
+            game = gameController.get(game);
             profile = game.getProfile(profile);
         } catch (ItemNotFoundException ex) {
             if (operation.equals(GCPOperation.ADD_PROFILE)) {
@@ -106,6 +103,7 @@ public class GameHandler {
                 gcpResponse = new GCPResponse(GCPCode.OK, gson.toJson(trophiesName));
                 break;
             case CLEAR_TROPHY:
+                profile.clearTrophy();
                 gcpResponse = new GCPResponse(GCPCode.OK);
                 break;
             case ADD_PROFILE:
@@ -117,6 +115,7 @@ public class GameHandler {
             case ADD_GAME:
                 break;
             case GET_TROPHY:
+
                 break;
             case SAVE_STATE:
                 LinkedTreeMap data = (LinkedTreeMap) gcpRequest.getData();
@@ -125,10 +124,12 @@ public class GameHandler {
                 gcpResponse = new GCPResponse(GCPCode.OK);
                 break;
             case LOAD_STATE:
+                gcpResponse = new GCPResponse(GCPCode.OK, profile);
                 break;
             case SAVE_MEDIA:
                 break;
             case LIST_MEDIA:
+                gcpResponse = new GCPResponse(GCPCode.OK, profile.getScreenshots());
                 break;
             default:
                 throw new AssertionError(operation.name());
@@ -136,11 +137,11 @@ public class GameHandler {
         game.updateProfile(profile);
 
         try {
-            GameController gameController = new GameController();
             gameController.update(game);
+            return gcpResponse;
         } catch (ItemNotFoundException ex) {
             Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex);
+            return new GCPResponse(GCPCode.FAIL);
         }
-        return gcpResponse;
     }
 }

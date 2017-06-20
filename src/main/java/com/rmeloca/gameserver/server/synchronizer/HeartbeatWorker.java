@@ -5,7 +5,6 @@ package com.rmeloca.gameserver.server.synchronizer;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-import com.rmeloca.gameserver.server.Synchronizer;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
