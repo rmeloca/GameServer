@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;
 import com.rmeloca.gameserver.controller.GameController;
+import com.rmeloca.gameserver.controller.exception.ItemAlreadyExistException;
 import com.rmeloca.gameserver.controller.exception.ItemNotFoundException;
 import com.rmeloca.gameserver.game.Game;
 import com.rmeloca.gameserver.game.Profile;
@@ -80,10 +81,30 @@ public class GameHandler {
         GameController gameController = new GameController();
         try {
             game = gameController.get(game);
+        } catch (ItemNotFoundException ex) {
+            if (operation.equals(GCPOperation.ADD_GAME)) {
+                try {
+                    gameController.add(game);
+                } catch (ItemAlreadyExistException ex1) {
+                    Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+            }
+        }
+        try {
             profile = game.getProfile(profile);
         } catch (ItemNotFoundException ex) {
             if (operation.equals(GCPOperation.ADD_PROFILE)) {
-                game.addProfile(profile);
+                try {
+                    gameController.get(game);
+                    game.addProfile(profile);
+                } catch (ItemNotFoundException ex1) {
+                    try {
+                        gameController.add(game);
+                        game.addProfile(profile);
+                    } catch (ItemAlreadyExistException ex2) {
+                        Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex2);
+                    }
+                }
             } else {
                 Synchronizer synchronizer = GameServer.getSynchronizer();
                 gcpResponse = synchronizer.askToFriends(gcpRequest);
@@ -113,9 +134,9 @@ public class GameHandler {
                 gcpResponse = new GCPResponse(GCPCode.OK, profile);
                 break;
             case ADD_GAME:
+                gcpResponse = new GCPResponse(GCPCode.OK);
                 break;
             case GET_TROPHY:
-
                 break;
             case SAVE_STATE:
                 LinkedTreeMap data = (LinkedTreeMap) gcpRequest.getData();
