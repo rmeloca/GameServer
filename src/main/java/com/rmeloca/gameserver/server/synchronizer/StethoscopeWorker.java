@@ -56,6 +56,7 @@ public class StethoscopeWorker implements Runnable {
                 return true;
             }
         }
+        Logger.getLogger(HeartbeatWorker.class.getName()).log(Level.SEVERE, null, "friend meeting " + address);
         return false;
     }
 }
