@@ -14,12 +14,14 @@ public class GCPRequest {
     private final String id;
     private final String game;
     private final String op;
+    private final String src;
     private Object data;
 
     public GCPRequest(String id, String game, GCPOperation op, Object data) {
         this.id = id;
         this.game = game;
         this.op = op.toString();
+        this.src = "meloca";
         this.data = data;
     }
 
@@ -42,6 +44,14 @@ public class GCPRequest {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public boolean isServer() {
+        return src != null && !src.isEmpty();
+    }
+
+    public boolean isClient() {
+        return !isServer();
     }
 
 }

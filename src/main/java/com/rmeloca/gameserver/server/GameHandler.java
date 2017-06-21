@@ -82,30 +82,11 @@ public class GameHandler {
         try {
             game = gameController.get(game);
         } catch (ItemNotFoundException ex) {
-            if (operation.equals(GCPOperation.ADD_GAME)) {
-                try {
-                    gameController.add(game);
-                } catch (ItemAlreadyExistException ex1) {
-                    Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex1);
-                }
-            }
         }
         try {
             profile = game.getProfile(profile);
         } catch (ItemNotFoundException ex) {
-            if (operation.equals(GCPOperation.ADD_PROFILE)) {
-                try {
-                    gameController.get(game);
-                    game.addProfile(profile);
-                } catch (ItemNotFoundException ex1) {
-                    try {
-                        gameController.add(game);
-                        game.addProfile(profile);
-                    } catch (ItemAlreadyExistException ex2) {
-                        Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex2);
-                    }
-                }
-            } else {
+            if (gcpRequest.isClient()) {
                 Synchronizer synchronizer = GameServer.getSynchronizer();
                 gcpResponse = synchronizer.askToFriends(gcpRequest);
                 return gcpResponse;
@@ -128,13 +109,29 @@ public class GameHandler {
                 gcpResponse = new GCPResponse(GCPCode.OK);
                 break;
             case ADD_PROFILE:
-                gcpResponse = new GCPResponse(GCPCode.OK);
+                try {
+                    gameController.get(game);
+                } catch (ItemNotFoundException ex) {
+                    try {
+                        gameController.add(game);
+                    } catch (ItemAlreadyExistException ex1) {
+                        Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
+                } finally {
+                    game.addProfile(profile);
+                    gcpResponse = new GCPResponse(GCPCode.OK);
+                }
                 break;
             case QUERY_PROFILE:
                 gcpResponse = new GCPResponse(GCPCode.OK, profile);
                 break;
             case ADD_GAME:
-                gcpResponse = new GCPResponse(GCPCode.OK);
+                try {
+                    gameController.add(game);
+                    gcpResponse = new GCPResponse(GCPCode.OK);
+                } catch (ItemAlreadyExistException ex) {
+                    gcpResponse = new GCPResponse(GCPCode.FAIL);
+                }
                 break;
             case GET_TROPHY:
                 break;
