@@ -48,7 +48,7 @@ public class StethoscopeWorker implements Runnable {
 
     private boolean isMine(DatagramPacket heartbeatDatagramPacket) throws SocketException {
         InetAddress address = heartbeatDatagramPacket.getAddress();
-        Logger.getLogger(HeartbeatWorker.class.getName()).log(Level.SEVERE, null, "friend meeting " + address);
+        Logger.getLogger(HeartbeatWorker.class.getName()).log(Level.INFO, "friend meeting {0}", address);
         NetworkInterface friendNetwork = NetworkInterface.getByInetAddress(address);
         Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
         while (networkInterfaces.hasMoreElements()) {
