@@ -5,6 +5,7 @@
  */
 package com.rmeloca.gameserver.game;
 
+import com.rmeloca.gameserver.controller.exception.ItemNotFoundException;
 import java.awt.Image;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -88,5 +89,14 @@ public class Profile implements Serializable {
         dump.append("\"").append(getName()).append("\"");
         dump.append("}");
         return dump.toString();
+    }
+
+    public Trophy getTrophy(Trophy trophy) throws ItemNotFoundException {
+        for (Trophy item : trophies) {
+            if (item.equals(trophy)) {
+                return item;
+            }
+        }
+        throw new ItemNotFoundException();
     }
 }

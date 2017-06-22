@@ -93,16 +93,17 @@ public class GameHandler {
             }
         }
 
+        Trophy trophy;
         switch (operation) {
             case ADD_TROPHY:
                 JsonObject objectTrophy = gson.fromJson(request.getContent(), JsonObject.class).get("data").getAsJsonObject();
-                Trophy trophy = gson.fromJson(objectTrophy, Trophy.class);
+                trophy = gson.fromJson(objectTrophy, Trophy.class);
                 profile.addTrophy(trophy);
                 gcpResponse = new GCPResponse(GCPCode.OK, trophy.getName());
                 break;
             case LIST_TROPHY:
                 ArrayList<String> trophiesName = profile.getTrophiesName();
-                gcpResponse = new GCPResponse(GCPCode.OK, gson.toJson(trophiesName));
+                gcpResponse = new GCPResponse(GCPCode.OK, trophiesName);
                 break;
             case CLEAR_TROPHY:
                 profile.clearTrophy();
@@ -134,6 +135,13 @@ public class GameHandler {
                 }
                 break;
             case GET_TROPHY:
+                trophy = new Trophy(gcpRequest.getData().toString());
+                try {
+                    trophy = profile.getTrophy(trophy);
+                    gcpResponse = new GCPResponse(GCPCode.OK, trophy);
+                } catch (ItemNotFoundException ex) {
+                    gcpResponse = new GCPResponse(GCPCode.FAIL);
+                }
                 break;
             case SAVE_STATE:
                 LinkedTreeMap data = (LinkedTreeMap) gcpRequest.getData();
