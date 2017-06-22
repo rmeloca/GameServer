@@ -39,6 +39,7 @@ public class StethoscopeWorker implements Runnable {
                 if (!isMine(heartbeatDatagramPacket)) {
                     InetAddress address = heartbeatDatagramPacket.getAddress();
                     this.synchronizer.meetFriend(new Friend(address, System.currentTimeMillis()));
+                    Logger.getLogger(HeartbeatWorker.class.getName()).log(Level.INFO, "friend meeting {0}", address);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(HeartbeatWorker.class.getName()).log(Level.SEVERE, null, ex);
@@ -49,11 +50,13 @@ public class StethoscopeWorker implements Runnable {
     private boolean isMine(DatagramPacket heartbeatDatagramPacket) throws SocketException {
         InetAddress address = heartbeatDatagramPacket.getAddress();
         NetworkInterface friendNetwork = NetworkInterface.getByInetAddress(address);
+        if (friendNetwork == null) {
+            return false;
+        }
         Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
         while (networkInterfaces.hasMoreElements()) {
             NetworkInterface nextElement = networkInterfaces.nextElement();
             if (nextElement.equals(friendNetwork)) {
-                Logger.getLogger(HeartbeatWorker.class.getName()).log(Level.INFO, "friend meeting {0}", address);
                 return true;
             }
         }
