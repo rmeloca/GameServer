@@ -69,104 +69,102 @@ public class GameHandler {
     }
 
     protected GCPResponse postGameResource(HTTPRequest request, String path) {
-        Gson gson = new Gson();
-        GCPRequest gcpRequest = gson.fromJson(request.getContent(), GCPRequest.class);
-        GCPOperation operation = gcpRequest.getOperation();
-        GCPResponse gcpResponse = null;
+        try {
+            Gson gson = new Gson();
+            GCPRequest gcpRequest = gson.fromJson(request.getContent(), GCPRequest.class);
+            GCPOperation operation = gcpRequest.getOperation();
+            GCPResponse gcpResponse = null;
 
-        String gameID = gcpRequest.getGameID();
-        String profileID = gcpRequest.getID();
-        Game game = new Game(gameID);
-        Profile profile = new Profile(profileID);
-        GameController gameController = new GameController();
-        try {
-            game = gameController.get(game);
-        } catch (ItemNotFoundException ex) {
-        }
-        try {
-            profile = game.getProfile(profile);
-        } catch (ItemNotFoundException ex) {
-            if (gcpRequest.isClient()) {
-                Synchronizer synchronizer = GameServer.getSynchronizer();
-                gcpResponse = synchronizer.askToFriends(gcpRequest);
-                return gcpResponse;
+            String gameID = gcpRequest.getGameID();
+            String profileID = gcpRequest.getID();
+            Game game = new Game(gameID);
+            Profile profile = new Profile(profileID);
+            GameController gameController = new GameController();
+            try {
+                game = gameController.get(game);
+            } catch (ItemNotFoundException ex) {
             }
-        }
+            try {
+                profile = game.getProfile(profile);
+            } catch (ItemNotFoundException ex) {
+                if (!operation.equals(GCPOperation.ADD_PROFILE) && gcpRequest.isClient()) {
+                    Synchronizer synchronizer = GameServer.getSynchronizer();
+                    gcpResponse = synchronizer.askToFriends(gcpRequest);
+                    return gcpResponse;
+                }
+            }
 
-        Trophy trophy;
-        switch (operation) {
-            case ADD_TROPHY:
-                JsonObject objectTrophy = gson.fromJson(request.getContent(), JsonObject.class).get("data").getAsJsonObject();
-                trophy = gson.fromJson(objectTrophy, Trophy.class);
-                profile.addTrophy(trophy);
-                gcpResponse = new GCPResponse(GCPCode.OK, trophy.getName());
-                break;
-            case LIST_TROPHY:
-                ArrayList<String> trophiesName = profile.getTrophiesName();
-                gcpResponse = new GCPResponse(GCPCode.OK, trophiesName);
-                break;
-            case CLEAR_TROPHY:
-                profile.clearTrophy();
-                gcpResponse = new GCPResponse(GCPCode.OK);
-                break;
-            case ADD_PROFILE:
-                try {
-                    gameController.get(game);
-                } catch (ItemNotFoundException ex) {
+            Trophy trophy;
+            switch (operation) {
+                case ADD_TROPHY:
+                    JsonObject objectTrophy = gson.fromJson(request.getContent(), JsonObject.class).get("data").getAsJsonObject();
+                    trophy = gson.fromJson(objectTrophy, Trophy.class);
+                    profile.addTrophy(trophy);
+                    gcpResponse = new GCPResponse(GCPCode.OK, trophy.getName());
+                    break;
+                case LIST_TROPHY:
+                    ArrayList<String> trophiesName = profile.getTrophiesName();
+                    gcpResponse = new GCPResponse(GCPCode.OK, trophiesName);
+                    break;
+                case CLEAR_TROPHY:
+                    profile.clearTrophy();
+                    gcpResponse = new GCPResponse(GCPCode.OK);
+                    break;
+                case ADD_PROFILE:
+                    try {
+                        gameController.get(game);
+                    } catch (ItemNotFoundException ex) {
+                        try {
+                            gameController.add(game);
+                        } catch (ItemAlreadyExistException ex1) {
+                            Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex1);
+                        }
+                    } finally {
+                        game.addProfile(profile);
+                        gcpResponse = new GCPResponse(GCPCode.OK);
+                    }
+                    break;
+                case QUERY_PROFILE:
+                    gcpResponse = new GCPResponse(GCPCode.OK, profile);
+                    break;
+                case ADD_GAME:
                     try {
                         gameController.add(game);
-                    } catch (ItemAlreadyExistException ex1) {
-                        Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex1);
+                        gcpResponse = new GCPResponse(GCPCode.OK);
+                    } catch (ItemAlreadyExistException ex) {
+                        gcpResponse = new GCPResponse(GCPCode.FAIL);
                     }
-                } finally {
-                    game.addProfile(profile);
+                    break;
+                case GET_TROPHY:
+                    trophy = new Trophy(gcpRequest.getData().toString());
+                    try {
+                        trophy = profile.getTrophy(trophy);
+                        gcpResponse = new GCPResponse(GCPCode.OK, trophy);
+                    } catch (ItemNotFoundException ex) {
+                        gcpResponse = new GCPResponse(GCPCode.FAIL);
+                    }
+                    break;
+                case SAVE_STATE:
+                    LinkedTreeMap data = (LinkedTreeMap) gcpRequest.getData();
+                    Double score = (Double) data.get("score");
+                    profile.addScore(score.intValue());
                     gcpResponse = new GCPResponse(GCPCode.OK);
-                }
-                break;
-            case QUERY_PROFILE:
-                gcpResponse = new GCPResponse(GCPCode.OK, profile);
-                break;
-            case ADD_GAME:
-                try {
-                    gameController.add(game);
-                    gcpResponse = new GCPResponse(GCPCode.OK);
-                } catch (ItemAlreadyExistException ex) {
-                    gcpResponse = new GCPResponse(GCPCode.FAIL);
-                }
-                break;
-            case GET_TROPHY:
-                trophy = new Trophy(gcpRequest.getData().toString());
-                try {
-                    trophy = profile.getTrophy(trophy);
-                    gcpResponse = new GCPResponse(GCPCode.OK, trophy);
-                } catch (ItemNotFoundException ex) {
-                    gcpResponse = new GCPResponse(GCPCode.FAIL);
-                }
-                break;
-            case SAVE_STATE:
-                LinkedTreeMap data = (LinkedTreeMap) gcpRequest.getData();
-                Double score = (Double) data.get("score");
-                profile.addScore(score.intValue());
-                gcpResponse = new GCPResponse(GCPCode.OK);
-                break;
-            case LOAD_STATE:
-                gcpResponse = new GCPResponse(GCPCode.OK, profile);
-                break;
-            case SAVE_MEDIA:
-                break;
-            case LIST_MEDIA:
-                gcpResponse = new GCPResponse(GCPCode.OK, profile.getScreenshots());
-                break;
-            default:
-                throw new AssertionError(operation.name());
-        }
-        game.updateProfile(profile);
-
-        try {
+                    break;
+                case LOAD_STATE:
+                    gcpResponse = new GCPResponse(GCPCode.OK, profile);
+                    break;
+                case SAVE_MEDIA:
+                    break;
+                case LIST_MEDIA:
+                    gcpResponse = new GCPResponse(GCPCode.OK, profile.getScreenshots());
+                    break;
+                default:
+                    throw new AssertionError(operation.name());
+            }
+            game.updateProfile(profile);
             gameController.update(game);
             return gcpResponse;
-        } catch (ItemNotFoundException ex) {
-            Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
             return new GCPResponse(GCPCode.FAIL);
         }
     }
