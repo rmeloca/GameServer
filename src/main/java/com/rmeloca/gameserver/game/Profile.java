@@ -30,6 +30,7 @@ public class Profile implements Serializable {
         this.score = 0;
         this.level = 0;
         this.screenshots = new ArrayList<>();
+        this.password = "";
     }
 
     public String getName() {
@@ -72,6 +73,10 @@ public class Profile implements Serializable {
         return screenshots;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Profile)) {
@@ -98,5 +103,9 @@ public class Profile implements Serializable {
             }
         }
         throw new ItemNotFoundException();
+    }
+
+    public boolean isAuthentic(Profile givenProfile) {
+        return this.equals(givenProfile) && this.password.equals(givenProfile.password);
     }
 }

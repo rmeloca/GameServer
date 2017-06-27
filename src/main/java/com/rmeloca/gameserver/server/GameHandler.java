@@ -68,6 +68,32 @@ public class GameHandler {
         return new GCPResponse(code, data);
     }
 
+    private boolean isAuthentic(GCPRequest gcpRequest) {
+        GCPOperation operation = gcpRequest.getOperation();
+        if (operation.equals(GCPOperation.ADD_PROFILE)) {
+            return true;
+        }
+        LinkedTreeMap data = (LinkedTreeMap) gcpRequest.getData();
+        String gameID = gcpRequest.getGameID();
+        String profileID = gcpRequest.getID();
+        String givenPassword = (String) data.get("password");
+
+        Profile givenProfile = new Profile(profileID);
+        givenProfile.setPassword(givenPassword);
+        Profile profile = givenProfile;
+        Game game = new Game(gameID);
+        GameController gameController = new GameController();
+        try {
+            game = gameController.get(game);
+            profile = game.getProfile(profile);
+            if (profile.isAuthentic(givenProfile)) {
+                return true;
+            }
+        } catch (ItemNotFoundException ex) {
+        }
+        return false;
+    }
+
     protected GCPResponse postGameResource(HTTPRequest request, String path) {
         try {
             Gson gson = new Gson();
@@ -92,6 +118,10 @@ public class GameHandler {
                     gcpResponse = synchronizer.askToFriends(gcpRequest);
                     return gcpResponse;
                 }
+            }
+
+            if (!isAuthentic(gcpRequest)) {
+                return new GCPResponse(GCPCode.FAIL);
             }
 
             Trophy trophy;
@@ -120,6 +150,9 @@ public class GameHandler {
                             Logger.getLogger(GameHandler.class.getName()).log(Level.SEVERE, null, ex1);
                         }
                     } finally {
+                        LinkedTreeMap data = (LinkedTreeMap) gcpRequest.getData();
+                        String password = (String) data.get("password");
+                        profile.setPassword(password);
                         game.addProfile(profile);
                         gcpResponse = new GCPResponse(GCPCode.OK);
                     }
