@@ -32,6 +32,7 @@ public class Profile implements Serializable {
         this.level = 0;
         this.screenshots = new ArrayList<>();
         this.password = "";
+        this.coordinate = new Coordinate(0.0, 0.0);
     }
 
     public String getName() {
