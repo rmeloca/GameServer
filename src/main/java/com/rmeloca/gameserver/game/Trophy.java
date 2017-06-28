@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class Trophy implements Serializable {
 
     private final String name;
-    private int experience;
+    private int xp;
     private String title;
     private String description;
 
@@ -31,7 +31,7 @@ public class Trophy implements Serializable {
     }
 
     public int getExperience() {
-        return experience;
+        return xp;
     }
 
     public String getTitle() {
@@ -43,7 +43,7 @@ public class Trophy implements Serializable {
     }
 
     public void setExperience(int experience) {
-        this.experience = experience;
+        this.xp = experience;
     }
 
     public void setTittle(String title) {
