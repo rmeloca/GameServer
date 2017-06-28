@@ -13,35 +13,35 @@ import java.io.Serializable;
  */
 public final class Coordinate implements Serializable {
 
-    private int x;
-    private int y;
+    private Double x;
+    private Double y;
 
-    public Coordinate(int x, int y) {
+    public Coordinate(Double x, Double y) {
         setX(x);
         setY(y);
     }
 
-    public int getX() {
+    public Double getX() {
         return x;
     }
 
-    private void setX(int x) {
+    private void setX(Double x) {
         if (x >= 0) {
             this.x = x;
         } else {
-            this.x = 0;
+            this.x = 0.0;
         }
     }
 
-    public int getY() {
+    public Double getY() {
         return y;
     }
 
-    private void setY(int y) {
+    private void setY(Double y) {
         if (y >= 0) {
             this.y = y;
         } else {
-            this.y = 0;
+            this.y = 0.0;
         }
     }
 
@@ -85,7 +85,7 @@ public final class Coordinate implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
-        return ((Coordinate) obj).getX() == x && ((Coordinate) obj).getY() == y;
+        return ((Coordinate) obj).getX().equals(x) && ((Coordinate) obj).getY().equals(y);
     }
 
 }
