@@ -20,7 +20,7 @@ public class Profile implements Serializable {
     private String password;
     private int score;
     private int level;
-    private int vidas;
+    private int lifes;
     private Coordinate coordinate;
     private final ArrayList<Trophy> trophies;
     private final ArrayList<Image> screenshots;
